@@ -170,6 +170,14 @@ Format:
 - Notes: follow-ups, migrations, or manual steps (e.g. deploy rules, new env vars)
 ```
 
+### 2026-10-22 — Stage graph label files with the graph refresh
+- Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
+- Changes: the pre-commit hook also stages the graph label files, so relabelled communities land in the same commit.
+  The current labels are committed.
+- Files: `scripts/git-hooks/pre-commit`, `graphify-out/.graphify_labels.json`, `graphify-out/.graphify_labels.json.sig`
+- Verification: hook syntax checked by running it on the staged change; secrets scan clean.
+- Notes: none.
+
 ### 2026-10-22 — Offline knowledge packs (phase 2)
 - Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
 - Changes:
