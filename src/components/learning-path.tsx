@@ -57,7 +57,7 @@ function LessonNode({
   const bg = status === "done" ? "var(--gold)" : active ? color.bg : "var(--locked)";
   const shadow = status === "done" ? "var(--gold-dark)" : active ? color.dark : "var(--locked-dark)";
   return (
-    <div ref={nodeRef} className="relative flex justify-center" style={{ transform: `translateX(${OFFSETS[index % OFFSETS.length]}px)` }}>
+    <div ref={nodeRef} className={cn("relative flex justify-center", selected && "z-20")} style={{ transform: `translateX(${OFFSETS[index % OFFSETS.length]}px)` }}>
       {status === "current" && !selected && (
         <div className="animate-bob absolute -top-11 left-1/2 z-10 whitespace-nowrap rounded-xl border-2 border-border bg-surface px-3 py-1.5 text-sm font-extrabold uppercase text-primary">
           Start

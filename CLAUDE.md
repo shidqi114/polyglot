@@ -115,6 +115,21 @@ Format:
 - Notes: follow-ups, migrations, or manual steps (e.g. deploy rules, new env vars)
 ```
 
+### 2026-10-22 — Fix lesson popover layering and iOS full-screen Home Screen mode
+- Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
+- Changes:
+  - The lesson popover on the learning path was drawn underneath the locked lessons after it; the selected lesson now
+    gets its own higher layer (`z-20`).
+  - Added the `apple-mobile-web-app-capable` meta tag (Next.js's `appleWebApp.capable` did not emit it). Without it,
+    iOS opens Home Screen apps with Safari's address bar and toolbar.
+  - Added `id: "/"` to the manifest so URLs with query strings (e.g. `/lesson?id=…`) belong to the same installed app.
+- Files: `src/components/learning-path.tsx`, `src/app/layout.tsx`, `src/app/manifest.ts`
+- Verification: lint, typecheck, unit tests 27/27, build, Playwright 8/8; overlap audit across all screens at phone and
+  desktop sizes (only expected scroll-under-tab-bar cases remain); served HTML checked for the meta tag.
+- Notes: a Home Screen icon added before this change keeps the old behaviour — delete it and add it again from Safari
+  while on `https://<domain>/`. Home Screen apps have their own storage separate from Safari, so progress made in Safari
+  appears in the Home Screen app only after signing in.
+
 ### 2026-10-22 — Add CLAUDE.md
 - Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
 - Changes: added this file with project overview, conventions, commands, the GitHub `main` workflow and the changelog.

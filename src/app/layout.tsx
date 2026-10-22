@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   description: "Bite-sized Japanese lessons: kana, JLPT vocabulary, kanji and grammar with spaced repetition.",
   applicationName: "Polyglot",
   appleWebApp: { capable: true, title: "Polyglot", statusBarStyle: "default" },
+  // iOS only reads this exact tag (Next.js's `capable` option did not emit it), and it
+  // is what makes a Home Screen app open full screen, without Safari's address bar and toolbar.
+  other: { "apple-mobile-web-app-capable": "yes" },
   formatDetection: { telephone: false },
   icons: {
     icon: [

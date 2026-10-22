@@ -5,6 +5,8 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Polyglot — Learn Japanese",
     short_name: "Polyglot",
     description: "Bite-sized Japanese lessons with spaced repetition.",
+    // Fixed identity: query strings (e.g. /lesson?id=…) belong to the same installed app.
+    id: "/",
     start_url: "/",
     scope: "/",
     display: "standalone",
