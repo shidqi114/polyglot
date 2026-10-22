@@ -1,9 +1,9 @@
 {
   "eslint.config.mjs": {
-    "mtime": 1792678696.2832477,
-    "seen": 1792683152.1283934,
-    "ast_hash": "26408551230357ef231ef7fa941dcc8a",
-    "semantic_hash": "26408551230357ef231ef7fa941dcc8a"
+    "mtime": 1792684442.9041345,
+    "seen": 1792684515.8281717,
+    "ast_hash": "1936422d14a3cc0d40ff3e540b424b2a",
+    "semantic_hash": ""
   },
   "firebase.json": {
     "mtime": 1792678113.253839,
@@ -24,10 +24,10 @@
     "semantic_hash": "cd37f37dcf909f6c623b1362b667846f"
   },
   "package.json": {
-    "mtime": 1792678471.0466635,
-    "seen": 1792683152.1284173,
-    "ast_hash": "716b985471ced49ba8a4a3cf870f95fc",
-    "semantic_hash": "716b985471ced49ba8a4a3cf870f95fc"
+    "mtime": 1792684415.5952058,
+    "seen": 1792684515.8281932,
+    "ast_hash": "5ac181cba7d1a8818049bf3414bd1510",
+    "semantic_hash": ""
   },
   "playwright.config.ts": {
     "mtime": 1792678471.0471866,
@@ -414,9 +414,9 @@
     "semantic_hash": "d69ffbb9f2f3e79a3a1fd885fc688736"
   },
   "CLAUDE.md": {
-    "mtime": 1792683311.2600365,
-    "seen": 1792683312.4389033,
-    "ast_hash": "21df299da00096cbd5fe1ddc7a71a614",
+    "mtime": 1792684503.8634195,
+    "seen": 1792684515.8283463,
+    "ast_hash": "31e9792a5ad2eaac15c9381fe118df0e",
     "semantic_hash": ""
   },
   "README.md": {
@@ -432,9 +432,33 @@
     "semantic_hash": ""
   },
   "scripts/git-hooks/pre-commit": {
-    "mtime": 1792683169.0652523,
-    "seen": 1792683173.7127385,
-    "ast_hash": "6b4abebd51b54bda1f0314bb9876caae",
+    "mtime": 1792684415.5641448,
+    "seen": 1792684515.8282084,
+    "ast_hash": "d4d186c1d711732cbba44c41d2bd3041",
+    "semantic_hash": ""
+  },
+  "scripts/check-secrets.mjs": {
+    "mtime": 1792684415.5608327,
+    "seen": 1792684515.8282058,
+    "ast_hash": "476a832d3c72e2878a03d7d8ba057b9b",
+    "semantic_hash": ""
+  },
+  "scripts/install-hooks.mjs": {
+    "mtime": 1792684415.5623565,
+    "seen": 1792684515.8282106,
+    "ast_hash": "ee9305d3ab215f491f5c99639c544e0e",
+    "semantic_hash": ""
+  },
+  "scripts/lib/secret-patterns.mjs": {
+    "mtime": 1792684415.5586977,
+    "seen": 1792684515.828213,
+    "ast_hash": "d310ff6420fb21a498259b2e4a1c55ac",
+    "semantic_hash": ""
+  },
+  "tests/unit/secrets.test.ts": {
+    "mtime": 1792684512.4644718,
+    "seen": 1792684515.8283381,
+    "ast_hash": "e3dca8fa63944231cf690bf2c48e3779",
     "semantic_hash": ""
   }
 }

@@ -78,6 +78,7 @@ npm run test:rules     # Firestore rules on the emulator (needs Java)
 npm run test:sync      # sign-in + cross-device sync against Firebase emulators (needs Java)
 npm run content        # regenerate src/content/generated from upstream datasets
 npm run icons          # regenerate PNG icons from public/icons/icon.svg
+npm run check:secrets  # fail if any tracked file holds a credential (the pre-commit hook checks staged changes)
 ```
 
 In the Claude Code cloud sandbox Playwright's own browser isn't downloadable; prefix e2e commands with
@@ -119,6 +120,22 @@ Format:
 - Verification: checks run and results
 - Notes: follow-ups, migrations, or manual steps (e.g. deploy rules, new env vars)
 ```
+
+### 2026-10-22 — Block committed credentials and version the git hooks
+- Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
+- Changes:
+  - The pre-commit hook blocks commits that add Google/Firebase API keys, private keys, service-account JSON, GitHub,
+    Slack or AWS tokens, or `.env*` files (`.env.example` is allowed). `npm run check:secrets` runs the same scan on all
+    tracked files.
+  - `npm install` now points git at the versioned hooks in `scripts/git-hooks` (replaces the manual copy step).
+  - Lint ignores the installed third-party skill folders (`.claude/`) and `graphify-out/`.
+  - Removed the local copy of the service-account key from the sandbox.
+- Files: `scripts/check-secrets.mjs`, `scripts/lib/secret-patterns.mjs`, `scripts/install-hooks.mjs`,
+  `scripts/git-hooks/pre-commit`, `tests/unit/secrets.test.ts`, `package.json`, `eslint.config.mjs`, `CLAUDE.md`
+- Verification: a staged fake key was blocked by the hook (exit 1) and then unstaged; `check:secrets` is clean on all
+  tracked files; lint, typecheck and unit tests (31/31) pass.
+- Notes: the service-account key was pasted into chat, so it must be revoked in Google Cloud (Service accounts →
+  rules-deployer → Keys). The original upload of that key is still on the sandbox at its upload path until you revoke it.
 
 ### 2026-10-22 — Clarify anki-jlpt-decks as inspiration and treat Firebase config as a secret
 - Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed

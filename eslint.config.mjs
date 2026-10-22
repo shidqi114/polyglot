@@ -19,6 +19,8 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      ".claude/**",
+      "graphify-out/**",
       "public/sw.js",
       "public/swe-worker-*.js",
       "playwright-report/**",

@@ -1,6 +1,12 @@
 #!/bin/sh
-# Refresh the graphify code graph so every commit carries an up-to-date graph.
-# Code-only and offline: no LLM or API key is needed. Never blocks the commit.
+# Repository pre-commit checks (enabled by scripts/install-hooks.mjs).
+# 1) Block commits that contain credentials. 2) Refresh the graphify code graph into the commit.
+
+node scripts/check-secrets.mjs --staged || {
+  echo "Commit blocked: remove the credential shown above, or unstage that file." >&2
+  exit 1
+}
+
 GRAPHIFY="$(command -v graphify 2>/dev/null || echo "$HOME/.local/bin/graphify")"
 if [ ! -x "$GRAPHIFY" ]; then
   echo "graphify not installed; skipping graph refresh" >&2
