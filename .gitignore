@@ -67,3 +67,4 @@ graphify-out/.graphify_*
 # graphify keeps dated snapshots of the previous graph when it relabels
 graphify-out/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/
 graphify-out/cache/
+.cache/

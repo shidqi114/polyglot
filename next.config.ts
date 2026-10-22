@@ -14,6 +14,8 @@ const withSerwist = withSerwistInit({
   swSrc: "src/app/sw.ts",
   swDest: "public/sw.js",
   disable: isDev,
+  // Only icons are precached. The knowledge packs are large and are cached on demand instead.
+  globPublicPatterns: ["icons/**/*"],
   // Lesson content is split into a few large JSON chunks; precache them for offline use.
   maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
 });

@@ -42,6 +42,9 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
 | `src/lib/firebase.ts`, `sync.ts` | Firebase init/sign-in and local-first Firestore sync |
 | `src/store/progress.ts` | Progress store: lessons, cards, day counters, settings, pending sync changes |
 | `firestore.rules`, `firebase.json` | Security rules (validated field by field) and emulator config |
+| `scripts/content/build-packs.ts` | Builds `public/packs/v1` (example sentences, pitch accent, verb forms, kanji strokes, idioms) from Kanjium, Tatoeba and KanjiVG |
+| `src/content/packs.ts`, `src/components/offline-content.tsx` | Typed loader for the packs, and the Profile section that downloads levels for offline use |
+| `src/lib/mora.ts` | Morae and pitch patterns (used by the word pages) |
 | `src/lib/backup.ts` | Zod validation of imported backup files (size cap, key allow-list, value ranges) |
 | `scripts/check-secrets.mjs`, `scripts/lib/secret-patterns.mjs` | Credential scanner used by the pre-commit hook and `npm run check:secrets` |
 | `scripts/git-hooks/pre-commit`, `scripts/install-hooks.mjs` | Versioned git hooks, enabled by `npm install` |
@@ -61,7 +64,9 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
   `n5-g-<grammarId>`. **Changing ids or lesson sizes breaks saved progress** — avoid, or add a migration.
 - UI: colours are CSS variables in `globals.css` (light + `.dark`); chunky buttons use `.btn-3d` with `--shadow`.
   Japanese text uses the `.jp` class. Layout must work at 390px wide (iPhone) and on desktop with no horizontal scroll.
-- Content licensing: vocabulary/kanji data is CC BY-SA 4.0 (EDRDG) via MIT-licensed converters. Do **not** copy code
+- Content licensing: vocabulary/kanji data is CC BY-SA 4.0 (EDRDG) via MIT-licensed converters. The knowledge packs add
+  Kanjium (CC BY-SA 4.0, with its required attribution sentence on the Credits page), Tatoeba sentences (CC BY 2.0 FR) and
+  KanjiVG (CC BY-SA 3.0); see `public/packs/v1/manifest.json`. Do **not** copy code
   from the AGPL/GPL reference repos (kana-dojo, read-frog, LLPlayer).
 - Inspiration only: `5mdld/anki-jlpt-decks` (CC BY-NC, Chinese glosses) informed the vocabulary note structure
   (word, reading, pitch accent, part of speech, example sentence). Its data and audio are **not** used. The vocabulary
@@ -89,6 +94,18 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
   once the upstream package ships the fix. CI runs `npm audit --omit=dev --audit-level=high`.
 - **App Check**: optional. Active when `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` is set; enforce it in the Firebase console.
 
+## Knowledge packs
+
+- `npm run packs` writes `public/packs/v1/<level>/{words,kanji,strokes}.json` and `extras.json`. Word records use the
+  ids of the bundled course data (`v:<word>:<reading>`), so progress and packs stay in step. Changing the course ids
+  means rebuilding the packs too.
+- Examples: a sentence must contain the word as a whole word (not inside a longer word). The word itself always gets its
+  dictionary reading. Furigana comes from Kanjium where it exists, otherwise from kuromoji. kuromoji can misread other
+  words in context (for example 書い read as かい), which is a known limitation.
+- The packs are cached on demand by the service worker (`knowledge-packs-v1`). Profile → Offline study content downloads
+  them ahead of time and asks the browser to keep them.
+- `tests/unit/packs.test.ts` checks ids, pitch ranges, markup-free text and stroke paths.
+
 ## Known issues
 
 - **Hydration mismatch (React #418), intermittent**: with the service worker active, roughly one browser-test run in
@@ -109,6 +126,7 @@ npm run test:rules     # Firestore rules on the emulator (needs Java)
 npm run test:sync      # sign-in + cross-device sync against Firebase emulators (needs Java)
 npm run content        # regenerate src/content/generated from upstream datasets
 npm run icons          # regenerate PNG icons from public/icons/icon.svg
+npm run packs          # rebuild the offline knowledge packs in public/packs/v1 (needs network; cached in .cache/)
 npm run check:secrets  # fail if any tracked file holds a credential (the pre-commit hook checks staged changes)
 ```
 
@@ -151,6 +169,26 @@ Format:
 - Verification: checks run and results
 - Notes: follow-ups, migrations, or manual steps (e.g. deploy rules, new env vars)
 ```
+
+### 2026-10-22 — Offline knowledge packs (phase 2)
+- Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
+- Changes:
+  - `npm run packs` builds offline packs for each JLPT level from open data: example sentences (furigana and English),
+    pitch accent, verb conjugation forms, kanji components, radical names, look-alikes, synonyms and antonyms, KanjiVG
+    stroke order for all 2,211 JLPT kanji, and 4,905 proverbs and idioms written with JLPT kanji.
+  - Example coverage per level: N5 633/718 words, N4 604/668, N3 1966/2140, N2 1190/1809, N1 1915/2699. Pitch accent
+    covers 1,335–2,277 words per level; conjugation forms 158–400 words for N5–N3.
+  - Profile → Offline study content downloads a level (or everything) and keeps it for offline use.
+  - Credits page lists Kanjium (with its attribution sentence), Tatoeba, KanjiVG and kuromoji/IPADIC.
+  - The service worker caches `/packs/` on demand and precaches only icons, which keeps the install small.
+- Files: `scripts/content/build-packs.ts`, `src/content/packs.ts`, `src/components/offline-content.tsx`, `src/lib/mora.ts`,
+  `src/app/sw.ts`, `next.config.ts`, `src/app/(tabs)/profile/page.tsx`, `src/app/(tabs)/credits/page.tsx`,
+  `public/packs/v1/**`, `tests/unit/packs.test.ts`, `tests/unit/mora.test.ts`, `tests/e2e/app.spec.ts`, `package.json`
+- Verification: pipeline run from the sources; pack tests (ids, pitch ranges, no markup, stroke paths) pass; 68 unit tests;
+  build; browser tests 10/10 including the packs served with security headers and the offline section on Profile.
+- Notes: the sentence matching now needs whole words, so coverage is lower than the first estimate. Kanji stroke data
+  comes from the official KanjiVG files. kuromoji is a build-time dependency only. The packs total 6.4 MB raw. Vercel
+  compresses them in transit.
 
 ### 2026-10-22 — Refresh curated graph labels
 - Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed

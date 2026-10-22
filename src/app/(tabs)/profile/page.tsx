@@ -6,6 +6,7 @@ import { useRef, useState, type ReactNode } from "react";
 import { Button, Card, cn, Toggle } from "@/components/ui";
 import { addDays, dayKey } from "@/lib/dates";
 import { parseBackup } from "@/lib/backup";
+import { OfflineContent } from "@/components/offline-content";
 import { firebaseConfigured, signInWithGoogle, signOut } from "@/lib/firebase";
 import { deleteAccount, deleteCloudData, syncNow, useAuth } from "@/lib/sync";
 import { streakOf, totalXp, useProgress, type Settings } from "@/store/progress";
@@ -363,6 +364,7 @@ export default function ProfilePage() {
 
       <DangerZone />
       <DataCard />
+      <OfflineContent />
 
       <p className="text-center text-sm text-muted">
         <Link href="/credits" className="underline">

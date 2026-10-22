@@ -2,6 +2,30 @@ import { Card } from "@/components/ui";
 
 const SOURCES = [
   {
+    name: "Kanjium (example sentences, conjugation tables, kanji details, pitch accents, idioms)",
+    url: "https://github.com/mifunetoshiro/kanjium",
+    license: "CC BY-SA 4.0",
+    use: "Study packs: example sentences with furigana, verb forms, look-alike and component data, pitch accent, proverbs and idioms. The pitch accent notation, verb particle data, phonetics, homonyms and other additions or modifications to EDICT, KANJIDIC or KRADFILE were provided by Uros O. through his free database.",
+  },
+  {
+    name: "Tatoeba sentence pairs",
+    url: "https://tatoeba.org",
+    license: "CC BY 2.0 FR",
+    use: "Example sentences and their English translations.",
+  },
+  {
+    name: "KanjiVG",
+    url: "https://kanjivg.tagaini.net",
+    license: "CC BY-SA 3.0",
+    use: "Stroke order for the JLPT kanji.",
+  },
+  {
+    name: "kuromoji with IPADIC",
+    url: "https://github.com/takuyaa/kuromoji.js",
+    license: "Apache-2.0 and the IPADIC licence",
+    use: "Furigana for example sentences that have none (built into the packs, not shipped as code).",
+  },
+  {
     name: "Open Anki JLPT Decks",
     url: "https://github.com/jamsinclair/open-anki-jlpt-decks",
     license: "MIT",

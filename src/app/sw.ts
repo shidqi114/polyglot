@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 import { defaultCache } from "@serwist/next/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
-import { NetworkOnly, Serwist } from "serwist";
+import { CacheFirst, NetworkOnly, Serwist } from "serwist";
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -23,6 +23,8 @@ const serwist = new Serwist({
     // Firebase auth handler pages must always hit the network.
     { matcher: ({ url }) => url.pathname.startsWith("/__/"), handler: new NetworkOnly() },
     { matcher: ({ url }) => PRIVATE_HOSTS.test(url.hostname), handler: new NetworkOnly() },
+    // Knowledge packs are versioned by path, so a cached copy never goes stale; they stay until the user clears them.
+    { matcher: ({ url }) => url.pathname.startsWith("/packs/"), handler: new CacheFirst({ cacheName: "knowledge-packs-v1" }) },
     ...defaultCache,
   ],
   fallbacks: {

@@ -15,6 +15,13 @@ async function expectNoHorizontalScroll(page: Page) {
   expect(overflow).toBeLessThanOrEqual(1);
 }
 
+test("knowledge packs are served with the security headers", async ({ request }) => {
+  const res = await request.get("/packs/v1/n5/words.json");
+  expect(res.ok()).toBe(true);
+  expect(res.headers()["content-security-policy"]).toBeTruthy();
+  expect((await res.json()).length).toBeGreaterThan(500);
+});
+
 test("security headers are served on every page", async ({ request }) => {
   const res = await request.get("/");
   expect(res.headers()["content-security-policy"]).toContain("default-src 'self'");
@@ -76,6 +83,8 @@ test("practice, profile and settings work on every screen size", async ({ page }
 
   await page.goto("/profile");
   await expect(page.getByRole("main").getByText("Daily goal")).toBeVisible();
+  await expect(page.getByText("Offline study content")).toBeVisible();
+
   await page.getByRole("button", { name: "Dark" }).click();
   await expect(page.locator("html")).toHaveClass(/dark/);
   await expectNoHorizontalScroll(page);

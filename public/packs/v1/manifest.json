@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-22T16:21:35.792Z",
+  "levels": {
+    "n5": {
+      "words": 718,
+      "withExamples": 633,
+      "withPitch": 512,
+      "withConjugation": 162,
+      "kanji": 79,
+      "withStrokes": 79
+    },
+    "n4": {
+      "words": 668,
+      "withExamples": 604,
+      "withPitch": 489,
+      "withConjugation": 158,
+      "kanji": 166,
+      "withStrokes": 166
+    },
+    "n3": {
+      "words": 2140,
+      "withExamples": 1966,
+      "withPitch": 1882,
+      "withConjugation": 400,
+      "kanji": 367,
+      "withStrokes": 367
+    },
+    "n2": {
+      "words": 1809,
+      "withExamples": 1190,
+      "withPitch": 1335,
+      "withConjugation": 170,
+      "kanji": 367,
+      "withStrokes": 367
+    },
+    "n1": {
+      "words": 2699,
+      "withExamples": 1915,
+      "withPitch": 2277,
+      "withConjugation": 234,
+      "kanji": 1232,
+      "withStrokes": 1232
+    }
+  },
+  "extras": {
+    "proverbs": 2143,
+    "idioms": 2762
+  },
+  "licenses": [
+    {
+      "name": "Kanjium (examples, conjugations, kanji details, pitch accents, idioms)",
+      "licence": "CC BY-SA 4.0",
+      "url": "https://github.com/mifunetoshiro/kanjium"
+    },
+    {
+      "name": "Tatoeba sentence pairs (via Kanjium particles.txt)",
+      "licence": "CC BY 2.0 FR",
+      "url": "https://tatoeba.org"
+    },
+    {
+      "name": "KanjiVG stroke order",
+      "licence": "CC BY-SA 3.0",
+      "url": "https://kanjivg.tagaini.net"
+    },
+    {
+      "name": "kuromoji with IPADIC (furigana)",
+      "licence": "Apache-2.0 / IPADIC licence",
+      "url": "https://github.com/takuyaa/kuromoji.js"
+    }
+  ],
+  "bytes": 6698491
+}
