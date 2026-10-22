@@ -70,6 +70,14 @@ test("dictionary search finds words by English, romaji and kanji", async ({ page
   await shot(page, "dictionary");
   await page.getByRole("button", { name: /食べる/ }).first().click();
   await expect(page.getByText("Kanji in this word")).toBeVisible();
+  // Word page 2.0: pitch accent and examples come from the study pack.
+  await expect(page.getByText("Pitch accent")).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText("Examples")).toBeVisible();
+  // Personal note, saved on this device.
+  await page.getByRole("button", { name: "Add note" }).click();
+  await page.getByPlaceholder("A mnemonic").fill("eat: ta-be-ru");
+  await page.getByRole("button", { name: "Save" }).click();
+  await expect(page.getByText("eat: ta-be-ru")).toBeVisible();
 });
 
 test("practice, profile and settings work on every screen size", async ({ page }) => {

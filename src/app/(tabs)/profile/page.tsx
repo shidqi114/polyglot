@@ -164,7 +164,7 @@ function DataCard() {
 
   const exportData = () => {
     const s = useProgress.getState();
-    const data = { app: "polyglot", version: 1, exportedAt: new Date().toISOString(), lessons: s.lessons, cards: s.cards, days: s.days, settings: s.settings };
+    const data = { app: "polyglot", version: 1, exportedAt: new Date().toISOString(), lessons: s.lessons, cards: s.cards, days: s.days, notes: s.notes, settings: s.settings };
     const url = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: "application/json" }));
     const a = document.createElement("a");
     a.href = url;
@@ -180,6 +180,7 @@ function DataCard() {
         lessons: backup.lessons,
         cards: backup.cards,
         days: backup.days,
+        ...(backup.notes ? { notes: backup.notes } : {}),
         settings: { ...useProgress.getState().settings, ...backup.settings },
       });
       setMsg("Backup restored.");

@@ -45,6 +45,10 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
 | `scripts/content/build-packs.ts` | Builds `public/packs/v1` (example sentences, pitch accent, verb forms, kanji strokes, idioms) from Kanjium, Tatoeba and KanjiVG |
 | `src/content/packs.ts`, `src/components/offline-content.tsx` | Typed loader for the packs, and the Profile section that downloads levels for offline use |
 | `src/lib/mora.ts` | Morae and pitch patterns (used by the word pages) |
+| `src/components/word/` | Word page 2.0: pitch graph, verb forms, examples, kanji parts, stroke order, personal note |
+| `src/content/use-pack.ts` | Hook that loads one level's study packs when a word page opens |
+| `src/lib/explain.ts` | "Why?" explanations for wrong answers (rules only, no model) |
+| `src/lib/pack-exercises.ts` | Sentence cloze and verb-form drills built from the packs |
 | `src/lib/backup.ts` | Zod validation of imported backup files (size cap, key allow-list, value ranges) |
 | `scripts/check-secrets.mjs`, `scripts/lib/secret-patterns.mjs` | Credential scanner used by the pre-commit hook and `npm run check:secrets` |
 | `scripts/git-hooks/pre-commit`, `scripts/install-hooks.mjs` | Versioned git hooks, enabled by `npm install` |
@@ -105,6 +109,15 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
 - The packs are cached on demand by the service worker (`knowledge-packs-v1`). Profile → Offline study content downloads
   them ahead of time and asks the browser to keep them.
 - `tests/unit/packs.test.ts` checks ids, pitch ranges, markup-free text and stroke paths.
+
+## Study features (phase 3)
+
+- The "Why?" notes come from `src/lib/explain.ts`: kana rules (small っ, small ゃゅょ, long vowel ー, voiced marks,
+  ん, は read as wa, same sound in another script) and particle or kana-pair hints. Add a rule with a unit test.
+- Confusions: a wrong choice is stored on the card (`cf`, last five). Notes are stored per item and synced to
+  `users/{uid}/notes/{itemId}`; an empty note is written as a tombstone so other devices learn it was cleared.
+- Vocabulary lessons add up to two cloze questions, and the dojo has Sentences and Verb forms modes. Both need the
+  study packs (Profile → Offline study content, or an online load).
 
 ## Known issues
 
@@ -177,6 +190,25 @@ Format:
 - Files: `scripts/git-hooks/pre-commit`, `graphify-out/.graphify_labels.json`, `graphify-out/.graphify_labels.json.sig`
 - Verification: hook syntax checked by running it on the staged change; secrets scan clean.
 - Notes: none.
+
+### 2026-10-22 — Word page 2.0, "Why?" explanations, pack drills and synced notes (phase 3)
+- Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
+- Changes:
+  - Word page: pitch-accent graph, verb forms (tap to hear), example sentences with furigana (toggle), English on demand,
+    kanji radical, parts, sound part, look-alikes, synonyms and antonyms, animated stroke order, and a personal note.
+  - "Why?" after a wrong answer: rule-based notes for kana mistakes and for particle and kana-pair confusions.
+  - Wrong choices are remembered on the card (up to five) for the review drills.
+  - Vocabulary lessons add up to two sentence cloze questions. Practice dojo gains Sentences and Verb forms.
+  - Notes are saved on this device and synced to the account; backups include them.
+- Files: `src/lib/explain.ts`, `src/lib/pack-exercises.ts`, `src/lib/mora.ts`, `src/components/word/*`,
+  `src/content/use-pack.ts`, `src/components/lesson/player.tsx`, `src/store/progress.ts`, `src/lib/sync.ts`,
+  `src/lib/srs.ts`, `src/lib/backup.ts`, `src/lib/lesson-engine.ts`, `src/app/lesson/page.tsx`,
+  `src/app/practice/run/page.tsx`, `src/content/practice-sets.ts`, `src/app/(tabs)/dictionary/page.tsx`,
+  `src/app/(tabs)/profile/page.tsx`, `src/app/globals.css`, tests in `tests/unit` and `tests/e2e`
+- Verification: unit tests (explainer, pack exercises, store, mora, packs); rules 10/10; browser 12/12 (word page
+  checks included); emulator sync 3/3 (delete, guest merge, note sync); lint, typecheck and build pass.
+- Notes: the "Why?" panel is covered by unit tests, not by a browser test. The grammar sentence-builder and the
+  listening exercises planned earlier are not included in this phase.
 
 ### 2026-10-22 — Offline knowledge packs (phase 2)
 - Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed

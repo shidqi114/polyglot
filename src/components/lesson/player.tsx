@@ -5,6 +5,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { BuildExercise, ChoiceExercise, GrammarNote, InputExercise, IntroCard, MatchExercise, AudioButton } from "./exercises";
 import { Button, cn, ProgressBar } from "../ui";
 import { checkBuild, checkInput } from "@/lib/answer-check";
+import { explainChoice, explainKana } from "@/lib/explain";
+import { toKana } from "wanakana";
 import { retry } from "@/lib/lesson-engine";
 import { sounds, vibrate } from "@/lib/sound";
 import type { Exercise } from "@/lib/types";
@@ -28,7 +30,15 @@ interface Props {
   repeatMistakes?: boolean;
 }
 
-type Feedback = { correct: boolean; answer?: string; audio?: string } | null;
+type Feedback = { correct: boolean; answer?: string; audio?: string; notes?: string[] } | null;
+
+/** Why a typed answer was wrong, from the typed text and the expected kana. */
+function inputNotes(ex: Extract<Exercise, { type: "input" }>, typed: string): string[] {
+  const expected = (ex.answers[0] ?? "").replace(/[()\s]/g, "");
+  if (ex.mode === "kana") return explainKana(typed, expected);
+  if (ex.mode === "romaji") return explainKana(toKana(typed), expected);
+  return [];
+}
 
 const PRAISE = ["Nice!", "Great job!", "Correct!", "Awesome!", "すごい！", "Excellent!", "いいね！"];
 const MAX_RETRIES = 2;
@@ -74,7 +84,7 @@ export function LessonPlayer({ exercises, onExit, onFinish, onGraded, repeatMist
   }, [idx, queue.length, finish]);
 
   const grade = useCallback(
-    (correct: boolean, answer?: string, audio?: string) => {
+    (correct: boolean, answer?: string, audio?: string, notes?: string[]) => {
       if (!ex) return;
       const origin = originOf.current.get(ex.key) ?? ex.key;
       const first = origin === ex.key;
@@ -97,7 +107,7 @@ export function LessonPlayer({ exercises, onExit, onFinish, onGraded, repeatMist
       if (soundOn) (correct ? sounds.correct : sounds.wrong)();
       if (!correct) vibrate(80);
       setPraise(PRAISE[Math.floor(Math.random() * PRAISE.length)]);
-      setFeedback({ correct, answer, audio });
+      setFeedback({ correct, answer, audio, notes: correct ? undefined : notes });
     },
     [ex, onGraded, repeatMistakes, soundOn],
   );
@@ -112,10 +122,18 @@ export function LessonPlayer({ exercises, onExit, onFinish, onGraded, repeatMist
   const check = useCallback(() => {
     if (!ex || feedback) return;
     if (ex.type === "choice" && choice != null) {
-      const correct = ex.options[choice].correct;
-      grade(correct, correct ? undefined : ex.answer, ex.optionsJapanese ? ex.answer : ex.audio);
+      const picked = ex.options[choice];
+      const correct = picked.correct;
+      if (!correct && ex.itemId) useProgress.getState().recordConfusion(ex.itemId, picked.label);
+      grade(
+        correct,
+        correct ? undefined : ex.answer,
+        ex.optionsJapanese ? ex.answer : ex.audio,
+        correct ? undefined : explainChoice(ex.answer, picked.label),
+      );
     } else if (ex.type === "input" && text.trim()) {
-      grade(checkInput(ex, text), ex.answer, ex.audio);
+      const correct = checkInput(ex, text);
+      grade(correct, ex.answer, ex.audio, correct ? undefined : inputNotes(ex, text));
     } else if (ex.type === "build" && built.length) {
       const chosen = built.map((i) => ex.tiles[i]);
       grade(checkBuild(ex.answer, chosen), ex.answer.join(""), ex.kana);
@@ -190,6 +208,12 @@ export function LessonPlayer({ exercises, onExit, onFinish, onGraded, repeatMist
               <div className="min-w-0 flex-1">
                 <div className="text-xl font-black">{feedback.correct ? praise : "Correct answer:"}</div>
                 {!feedback.correct && feedback.answer && <div className="jp text-lg font-semibold">{feedback.answer}</div>}
+                {!feedback.correct &&
+                  feedback.notes?.map((note) => (
+                    <p key={note} className="mt-1 text-sm">
+                      {note}
+                    </p>
+                  ))}
               </div>
               {feedback.audio && <AudioButton text={feedback.audio} size="sm" />}
             </div>

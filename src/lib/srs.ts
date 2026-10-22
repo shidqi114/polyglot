@@ -12,6 +12,7 @@ export interface SrsCard {
   st: number; // state
   lr: number | null; // last review (ms)
   up: number; // last local change (ms), used for merge
+  cf?: string[]; // answers the learner confused with this item (most recent first, at most 5)
 }
 
 // Short-term (minute-level) steps make little sense for a lesson app, so
@@ -58,7 +59,8 @@ const GRADES: Record<Grading, Grade> = {
 
 export function reviewCard(card: SrsCard | undefined, grading: Grading, now = Date.now()): SrsCard {
   const base = card ? toCard(card) : createEmptyCard(new Date(now));
-  return fromCard(scheduler.next(base, new Date(now), GRADES[grading]).card, now);
+  const next = fromCard(scheduler.next(base, new Date(now), GRADES[grading]).card, now);
+  return card?.cf ? { ...next, cf: card.cf } : next;
 }
 
 export function isDue(card: SrsCard, now = Date.now()): boolean {

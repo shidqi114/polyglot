@@ -24,7 +24,7 @@ export function answerLabel(item: StudyItem): string {
 }
 
 /** Items from the pool that can't be confused with `item` (no shared answer or front). */
-function distractors(item: StudyItem, pool: StudyItem[], n: number, rng: Rng): StudyItem[] {
+export function distractors(item: StudyItem, pool: StudyItem[], n: number, rng: Rng): StudyItem[] {
   const meanings = new Set(item.meanings.map(lc));
   const seenLabel = new Set([lc(item.meanings[0])]);
   const seenFront = new Set([item.front, item.reading]);
@@ -215,7 +215,8 @@ export function buildReviewExercise(item: StudyItem, pool: StudyItem[], rng: Rng
   return rng() < 0.3 ? recognize(item, pool, rng) : harder(item, pool, rng);
 }
 
-export type PracticeMode = "pick" | "reverse-pick" | "input" | "reverse-input";
+// "sentence" and "conjugation" need the study packs; the practice page builds those with pack-exercises.ts.
+export type PracticeMode = "pick" | "reverse-pick" | "input" | "reverse-input" | "sentence" | "conjugation";
 
 export function buildPracticeExercise(
   item: StudyItem,
@@ -232,6 +233,9 @@ export function buildPracticeExercise(
       return typeIt(item);
     case "reverse-input":
       return typeFromMeaning(item);
+    case "sentence":
+    case "conjugation":
+      return recognize(item, pool, rng); // built from pack data by pack-exercises.ts
   }
 }
 

@@ -27,6 +27,11 @@ export interface Settings {
   showReadings: boolean;
 }
 
+export interface Note {
+  text: string;
+  up: number;
+}
+
 export const DEFAULT_SETTINGS: Settings = {
   dailyGoal: 20,
   theme: "system",
@@ -41,6 +46,7 @@ export interface Pending {
   days: Record<string, DayStats>;
   lessons: Record<string, number>; // completions delta
   cards: Record<string, number>; // change marker from stamp()
+  notes: Record<string, number>;
   settings: boolean;
 }
 
@@ -51,13 +57,14 @@ function stamp(): number {
   return lastStamp;
 }
 
-const emptyPending = (): Pending => ({ days: {}, lessons: {}, cards: {}, settings: false });
+const emptyPending = (): Pending => ({ days: {}, lessons: {}, cards: {}, notes: {}, settings: false });
 
 export interface ProgressData {
   ownerUid: string | null;
   lessons: Record<string, LessonProgress>;
   cards: Record<string, SrsCard>;
   days: Record<string, DayStats>;
+  notes: Record<string, Note>;
   settings: Settings;
   settingsUp: number;
   lastPull: number;
@@ -67,6 +74,10 @@ export interface ProgressData {
 interface ProgressActions {
   completeLesson(lessonId: string, accuracy: number, xp: number, results: { itemId: string; correct: boolean }[]): void;
   recordReview(itemId: string, correct: boolean): void;
+  /** Remembers a wrong choice for an item, for the confusion drills. */
+  recordConfusion(itemId: string, picked: string): void;
+  /** Saves a personal note on an item. Empty text clears it (the cloud copy is cleared too). */
+  setNote(itemId: string, text: string): void;
   addXp(xp: number): void;
   updateSettings(patch: Partial<Settings>): void;
   /** Bulk replace, used by sync and import. */
@@ -82,6 +93,7 @@ const initialData = (): ProgressData => ({
   lessons: {},
   cards: {},
   days: {},
+  notes: {},
   settings: DEFAULT_SETTINGS,
   settingsUp: 0,
   lastPull: 0,
@@ -155,6 +167,29 @@ export const useProgress = create<ProgressState>()(
         });
       },
 
+      recordConfusion(itemId, picked) {
+        set((s) => {
+          const card = s.cards[itemId];
+          if (!card) return {};
+          const up = stamp();
+          const cf = [picked, ...(card.cf ?? []).filter((x) => x !== picked)].slice(0, 5);
+          return {
+            cards: { ...s.cards, [itemId]: { ...card, cf, up } },
+            pending: { ...s.pending, cards: { ...s.pending.cards, [itemId]: up } },
+          };
+        });
+      },
+
+      setNote(itemId, text) {
+        set((s) => {
+          const up = stamp();
+          return {
+            notes: { ...s.notes, [itemId]: { text: text.trim().slice(0, 2000), up } },
+            pending: { ...s.pending, notes: { ...s.pending.notes, [itemId]: up } },
+          };
+        });
+      },
+
       addXp(xp) {
         if (xp > 0) set((s) => bumpDay(s, { xp }));
       },
@@ -191,8 +226,10 @@ export const useProgress = create<ProgressState>()(
           }
           const cards: Record<string, number> = {};
           for (const [k, up] of Object.entries(s.pending.cards)) if (snapshot.cards[k] !== up) cards[k] = up;
+          const notes: Record<string, number> = {};
+          for (const [k, up] of Object.entries(s.pending.notes)) if (snapshot.notes[k] !== up) notes[k] = up;
           return {
-            pending: { days, lessons, cards, settings: s.pending.settings && !snapshot.settings },
+            pending: { days, lessons, cards, notes, settings: s.pending.settings && !snapshot.settings },
           };
         });
       },
@@ -210,6 +247,7 @@ export const useProgress = create<ProgressState>()(
         lessons: s.lessons,
         cards: s.cards,
         days: s.days,
+        notes: s.notes,
         settings: s.settings,
         settingsUp: s.settingsUp,
         lastPull: s.lastPull,

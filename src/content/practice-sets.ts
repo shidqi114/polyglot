@@ -17,6 +17,8 @@ export const MODE_INFO: Record<PracticeMode, { title: string; description: strin
   "reverse-pick": { title: "Reverse pick", description: "See the meaning, choose the Japanese" },
   input: { title: "Input", description: "See Japanese, type the reading" },
   "reverse-input": { title: "Reverse input", description: "See the meaning, type it in Japanese" },
+  sentence: { title: "Sentences", description: "Fill in the blank in an example sentence" },
+  conjugation: { title: "Verb forms", description: "Choose the right form of a verb" },
 };
 
 const kanaSet = (script: "hiragana" | "katakana", glyph: string): PracticeSet => ({
@@ -33,7 +35,7 @@ const vocabSet = (level: Level): PracticeSet => ({
   title: `${level.toUpperCase()} vocabulary`,
   subtitle: "JLPT word list",
   glyph: "語",
-  modes: ["pick", "reverse-pick", "input", "reverse-input"],
+  modes: ["pick", "reverse-pick", "input", "reverse-input", "sentence", "conjugation"],
   load: async () => (await loadLevel(level)).vocab,
 });
 

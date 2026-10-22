@@ -85,3 +85,26 @@ test("deleting cloud data removes it from Firestore and signs the device out", a
   }
   await expect(page.getByText("Guest", { exact: true }).first()).toBeVisible();
 });
+
+test("a note written on one device appears on another", async ({ browser }) => {
+  const uid = `note-${Date.now()}`;
+  const a = await (await browser.newContext()).newPage();
+  await a.goto("/dictionary");
+  await a.getByPlaceholder("Search English, romaji, kana or kanji").fill("taberu");
+  await a.getByRole("button", { name: /食べる/ }).first().click();
+  await a.getByRole("button", { name: "Add note" }).click();
+  await a.getByPlaceholder("A mnemonic").fill("note from device A");
+  await a.getByRole("button", { name: "Save" }).click();
+  await a.goto("/profile");
+  await signIn(a, uid);
+  await expect(a.getByText(/^Synced/)).toBeVisible({ timeout: 15_000 });
+
+  const b = await (await browser.newContext()).newPage();
+  await b.goto("/profile");
+  await signIn(b, uid);
+  await expect(b.getByText(/^Synced/)).toBeVisible({ timeout: 15_000 });
+  await b.goto("/dictionary");
+  await b.getByPlaceholder("Search English, romaji, kana or kanji").fill("taberu");
+  await b.getByRole("button", { name: /食べる/ }).first().click();
+  await expect(b.getByText("note from device A")).toBeVisible({ timeout: 15_000 });
+});

@@ -48,7 +48,8 @@ function hasPending(p: Pending): boolean {
     p.settings ||
     Object.keys(p.days).length > 0 ||
     Object.keys(p.lessons).length > 0 ||
-    Object.keys(p.cards).length > 0
+    Object.keys(p.cards).length > 0 ||
+    Object.keys(p.notes).length > 0
   );
 }
 
@@ -72,6 +73,11 @@ async function flush(db: Firestore, uid: string): Promise<void> {
         { merge: true },
       ),
     );
+  }
+  for (const [id, up] of Object.entries(snapshot.notes)) {
+    // An empty note is written as a tombstone, so other devices learn that it was cleared.
+    const note = state.notes[id] ?? { text: "", up };
+    ops.push((b) => b.set(doc(db, `${base}/notes/${id}`), { text: note.text, up: note.up, srv: serverTimestamp() }));
   }
   for (const [id, times] of Object.entries(snapshot.lessons)) {
     const l = state.lessons[id];
@@ -104,11 +110,12 @@ async function pull(db: Firestore, uid: string): Promise<void> {
   const since = Timestamp.fromMillis(useProgress.getState().lastPull);
   const sub = (name: string) =>
     getDocsFromServer(query(collection(db, `users/${uid}/${name}`), where("srv", ">", since)));
-  const [profile, days, lessons, cards] = await Promise.all([
+  const [profile, days, lessons, cards, notes] = await Promise.all([
     getDocFromServer(doc(db, `users/${uid}`)),
     sub("days"),
     sub("lessons"),
     sub("cards"),
+    sub("notes"),
   ]);
 
   const s = useProgress.getState();
@@ -151,6 +158,15 @@ async function pull(db: Firestore, uid: string): Promise<void> {
     if (!local || card.up >= local.up) nextCards[d.id] = card;
   });
 
+  const nextNotes = { ...s.notes };
+  notes.forEach((d) => {
+    const r = d.data() as WithSrv<{ text: string; up: number }>;
+    seen(r.srv);
+    const local = s.notes[d.id];
+    if (s.pending.notes[d.id] && local) return; // local edit wins until it's flushed
+    if (!local || (r.up ?? 0) >= local.up) nextNotes[d.id] = { text: r.text ?? "", up: r.up ?? 0 };
+  });
+
   let settings = s.settings;
   let settingsUp = s.settingsUp;
   if (profile.exists()) {
@@ -162,6 +178,7 @@ async function pull(db: Firestore, uid: string): Promise<void> {
   }
 
   useProgress.getState().setData({
+    notes: nextNotes,
     days: nextDays,
     lessons: nextLessons,
     cards: nextCards,
@@ -223,7 +240,13 @@ function adoptGuestData(uid: string) {
   s.setData({
     ownerUid: uid,
     lastPull: 0,
-    pending: { days: { ...s.days }, lessons, cards, settings: s.settingsUp > 0 },
+    pending: {
+      days: { ...s.days },
+      lessons,
+      cards,
+      notes: Object.fromEntries(Object.entries(s.notes).map(([id, note]) => [id, note.up])),
+      settings: s.settingsUp > 0,
+    },
   });
 }
 

@@ -81,3 +81,42 @@ describe("progress store", () => {
     expect(s.pending.settings).toBe(true);
   });
 });
+
+describe("notes and confusions", () => {
+  beforeEach(() => useProgress.getState().reset(null));
+
+  it("saves a note, trims it, and marks it for sync", () => {
+    useProgress.getState().setNote("v:食べる:たべる", "  eat — 'tabe' + ru  ");
+    const s = useProgress.getState();
+    expect(s.notes["v:食べる:たべる"].text).toBe("eat — 'tabe' + ru");
+    expect(s.pending.notes["v:食べる:たべる"]).toBeGreaterThan(0);
+  });
+
+  it("keeps notes out of the pending list once they have been flushed", () => {
+    const st = useProgress.getState();
+    st.setNote("k:あ", "a");
+    const snapshot = useProgress.getState().pending;
+    st.setNote("k:あ", "ah"); // edited while the write was in flight
+    useProgress.getState().clearPending(snapshot);
+    expect(useProgress.getState().pending.notes["k:あ"]).toBeGreaterThan(0);
+  });
+
+  it("remembers up to five wrong choices for a card, most recent first", () => {
+    const st = useProgress.getState();
+    st.completeLesson("kana-h-0-0", 1, 10, [{ itemId: "k:か", correct: true }]);
+    for (const wrong of ["が", "き", "さ", "た", "な", "は"]) useProgress.getState().recordConfusion("k:か", wrong);
+    const cf = useProgress.getState().cards["k:か"].cf;
+    expect(cf).toEqual(["は", "な", "た", "さ", "き"]);
+  });
+
+  it("ignores confusions for items that have no card yet", () => {
+    useProgress.getState().recordConfusion("k:ん", "ぬ");
+    expect(useProgress.getState().cards["k:ん"]).toBeUndefined();
+  });
+
+  it("keeps the confusion list through a review", async () => {
+    const { reviewCard } = await import("@/lib/srs");
+    const card = { ...reviewCard(undefined, "good"), cf: ["が"] };
+    expect(reviewCard(card, "good").cf).toEqual(["が"]);
+  });
+});

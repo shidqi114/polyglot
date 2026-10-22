@@ -166,3 +166,21 @@ body {
     transition-duration: 1ms !important;
   }
 }
+
+/* Stroke order: each KanjiVG stroke is drawn in turn (see src/components/word/stroke-order.tsx). */
+.stroke-anim {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw-stroke 0.5s ease forwards;
+}
+@keyframes draw-stroke {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stroke-anim {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}

@@ -44,6 +44,8 @@ const cardSchema = z.strictObject({
   cf: z.array(z.string().max(64)).max(5).optional(),
 });
 
+const noteSchema = z.strictObject({ text: z.string().max(2000), up: timestamp });
+
 export const backupSchema = z.strictObject({
   app: z.literal("polyglot"),
   version: z.literal(1),
@@ -52,6 +54,7 @@ export const backupSchema = z.strictObject({
   lessons: z.record(z.string().regex(/^[a-z0-9][a-z0-9-]{0,39}$/), lessonSchema),
   cards: z.record(z.string().regex(/^[kvj]:[^\u0000-\u001f/]{1,120}$/u), cardSchema),
   days: z.record(z.string().regex(/^\d{4}-\d{2}-\d{2}$/), daySchema),
+  notes: z.record(z.string().regex(/^[kvj]:[^\u0000-\u001f/]{1,120}$/u), noteSchema).optional(),
 });
 
 export type Backup = z.infer<typeof backupSchema>;

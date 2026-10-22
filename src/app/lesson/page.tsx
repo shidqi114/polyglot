@@ -8,8 +8,10 @@ import { Button } from "@/components/ui";
 import { LESSON_BY_ID } from "@/content/course";
 import { GRAMMAR_BY_ID } from "@/content/grammar";
 import { getLessonItems } from "@/content/loader";
+import { loadWords } from "@/content/packs";
 import { nextLessonId } from "@/lib/course-progress";
 import { buildGrammarLesson, buildItemLesson } from "@/lib/lesson-engine";
+import { addClozeExercises } from "@/lib/pack-exercises";
 import type { Exercise } from "@/lib/types";
 import { useProgress } from "@/store/progress";
 
@@ -50,7 +52,10 @@ function Lesson({ lessonId }: { lessonId: string }) {
           if (!cancelled) setExercises(buildGrammarLesson(g));
         } else {
           const { items, pool } = await getLessonItems(lesson);
-          if (!cancelled) setExercises(buildItemLesson(items, pool));
+          const built = buildItemLesson(items, pool);
+          // Vocabulary lessons add sentence cloze questions when the study pack is available offline or online.
+          const words = lesson.kind === "vocab" ? await loadWords(lesson.level!).catch(() => undefined) : undefined;
+          if (!cancelled) setExercises(words ? addClozeExercises(built, items, words, pool) : built);
         }
       } catch {
         if (!cancelled) setError(true);

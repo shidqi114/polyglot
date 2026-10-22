@@ -4,6 +4,7 @@ import { ArrowLeft, Search } from "lucide-react";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { isRomaji, toHiragana } from "wanakana";
 import { AudioButton, KanjiReadings } from "@/components/lesson/exercises";
+import { WordPanel } from "@/components/word/word-panel";
 import { Card, cn } from "@/components/ui";
 import { loadIndex } from "@/content/loader";
 import { strengthBars } from "@/lib/srs";
@@ -78,6 +79,7 @@ function Detail({ item, all, onBack, onOpen }: { item: StudyItem; all: StudyItem
           {card ? `In your reviews · next review ${new Date(card.due).toLocaleDateString()}` : "Not learned yet"}
         </div>
       </Card>
+      <WordPanel item={item} />
       {kanjiParts.length > 0 && (
         <Card>
           <div className="mb-2 font-extrabold">Kanji in this word</div>
