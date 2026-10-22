@@ -57,8 +57,13 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
 - UI: colours are CSS variables in `globals.css` (light + `.dark`); chunky buttons use `.btn-3d` with `--shadow`.
   Japanese text uses the `.jp` class. Layout must work at 390px wide (iPhone) and on desktop with no horizontal scroll.
 - Content licensing: vocabulary/kanji data is CC BY-SA 4.0 (EDRDG) via MIT-licensed converters. Do **not** copy code
-  from the AGPL/GPL reference repos (kana-dojo, read-frog, LLPlayer) or data from anki-jlpt-decks (CC BY-NC, Chinese).
-- Never commit secrets. Firebase web config goes in Vercel env vars / `.env.local` (see `.env.example`).
+  from the AGPL/GPL reference repos (kana-dojo, read-frog, LLPlayer).
+- Inspiration only: `5mdld/anki-jlpt-decks` (CC BY-NC, Chinese glosses) informed the vocabulary note structure
+  (word, reading, pitch accent, part of speech, example sentence). Its data and audio are **not** used. The vocabulary
+  data comes from `jamsinclair/open-anki-jlpt-decks` (MIT), a different repository.
+- Secrets: the Firebase web config (`NEXT_PUBLIC_FIREBASE_*`) is treated as a secret. It must never be committed or
+  pushed to the repo. Keep it in Vercel environment variables and in `.env.local`, which git ignores. See `.env.example`
+  and `docs/SETUP.md`.
 
 ## Commands
 
@@ -114,6 +119,18 @@ Format:
 - Verification: checks run and results
 - Notes: follow-ups, migrations, or manual steps (e.g. deploy rules, new env vars)
 ```
+
+### 2026-10-22 — Clarify anki-jlpt-decks as inspiration and treat Firebase config as a secret
+- Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
+- Changes:
+  - `5mdld/anki-jlpt-decks` is listed as inspiration for the vocabulary note structure. Its data and audio are not used,
+    and the data source remains `jamsinclair/open-anki-jlpt-decks` (MIT).
+  - The Firebase web config is treated as a secret: never committed or pushed. It lives only in Vercel env vars and
+    `.env.local`.
+- Files: `CLAUDE.md`, `docs/SETUP.md`, `.env.example`
+- Verification: documentation only; no code changed.
+- Notes: the graph's AMBIGUOUS edges for these two points are now resolved by this wording. The graph reflects code
+  only, so it was not regenerated for these doc edits.
 
 ### 2026-10-22 — Add graphify knowledge graph and commit hook
 - Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed

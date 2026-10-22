@@ -414,9 +414,9 @@
     "semantic_hash": "d69ffbb9f2f3e79a3a1fd885fc688736"
   },
   "CLAUDE.md": {
-    "mtime": 1792683169.087186,
-    "seen": 1792683173.7128215,
-    "ast_hash": "02d0f16e07b87d4fa8620c2b00a963db",
+    "mtime": 1792683311.2600365,
+    "seen": 1792683312.4389033,
+    "ast_hash": "21df299da00096cbd5fe1ddc7a71a614",
     "semantic_hash": ""
   },
   "README.md": {
@@ -426,10 +426,10 @@
     "semantic_hash": "50d8dff1205ec9e3eda59bbfa15621a5"
   },
   "docs/SETUP.md": {
-    "mtime": 1792678607.403784,
-    "seen": 1792683152.128514,
-    "ast_hash": "3684c51201a7881042e238b95212686c",
-    "semantic_hash": "3684c51201a7881042e238b95212686c"
+    "mtime": 1792683305.186632,
+    "seen": 1792683312.4389095,
+    "ast_hash": "6defb98ed860597777c8745c22418e61",
+    "semantic_hash": ""
   },
   "scripts/git-hooks/pre-commit": {
     "mtime": 1792683169.0652523,

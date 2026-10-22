@@ -37,7 +37,10 @@ In Vercel → your project → **Settings → Environment Variables**, add (for 
 | `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | `messagingSenderId` |
 | `NEXT_PUBLIC_FIREBASE_APP_ID` | `appId` |
 
-These values are public identifiers, not secrets; the Firestore security rules are what protect your data.
+**Treat these values as secrets.** Do not paste them into the repository, commit them, or share them in chat or screenshots.
+They belong only in Vercel's environment variables and in your local `.env.local` file, which git ignores.
+(Browsers still receive these values in the built app, which is normal for Firebase web apps. The Firestore security rules,
+not keeping the config hidden, are what protect your data.)
 
 > **Why the auth domain is your Vercel domain:** Safari (and especially the iPhone home-screen app)
 > blocks the cross-site storage that Firebase's default `firebaseapp.com` sign-in page relies on.
