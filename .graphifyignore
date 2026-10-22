@@ -1,0 +1,5 @@
+# Third-party skills installed for Claude Code (not part of the app)
+.claude/
+# graphify outputs themselves
+graphify-out/
+public/icons/

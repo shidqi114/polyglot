@@ -58,3 +58,7 @@ ui-debug.log
 .next-sync/
 # Playwright CLI output (may contain credentials)
 .playwright-cli/
+
+# graphify: intermediate build files and incremental-extraction cache
+graphify-out/.graphify_*
+graphify-out/cache/
