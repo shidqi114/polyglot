@@ -152,6 +152,14 @@ Format:
 - Notes: follow-ups, migrations, or manual steps (e.g. deploy rules, new env vars)
 ```
 
+### 2026-10-22 — Refresh curated graph labels
+- Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
+- Changes: community names in the graph re-curated for the current 24 communities; the label and signature files are
+  tracked. graphify's dated snapshots of the previous graph are no longer committed.
+- Files: `graphify-out/.graphify_labels.json`, `graphify-out/.graphify_labels.json.sig`, `graphify-out/graph.json`, `.gitignore`
+- Verification: the label signatures were generated with graphify's own function; the graph reports 24 named communities.
+- Notes: none.
+
 ### 2026-10-22 — Security hardening: rules, deletion, backups, network policy, CI
 - Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
 - Changes:
