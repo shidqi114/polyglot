@@ -50,6 +50,7 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
 | `src/lib/firebase.ts`, `sync.ts` | Firebase init/sign-in and local-first Firestore sync |
 | `src/store/progress.ts` | Progress store: lessons, cards, day counters, settings, pending sync changes |
 | `firestore.rules`, `firebase.json` | Security rules (validated field by field) and emulator config |
+| `scripts/deploy-rules.mjs` | Deploys `firestore.rules` to the project in `FIREBASE_PROJECT_ID` once the rules tests pass and the rules are committed (`npm run deploy:rules`) |
 | `scripts/content/build-packs.ts` | Builds `public/packs/v1` (example sentences, pitch accent, verb forms, kanji strokes, idioms) from Kanjium, Tatoeba and KanjiVG |
 | `src/content/packs.ts`, `src/components/offline-content.tsx` | Typed loader for the packs, and the Profile section that downloads levels for offline use |
 | `src/lib/mora.ts` | Morae and pitch patterns (used by the word pages) |
@@ -71,7 +72,7 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
   flushes to Firestore. Day stats are counters written with `increment()`; cards merge by `up` timestamp.
   Total XP and streaks are *derived* from `days` — never store them separately.
 - Firestore layout: `users/{uid}` (settings), `users/{uid}/days/{YYYY-MM-DD}`, `users/{uid}/lessons/{id}`,
-  `users/{uid}/cards/{itemId}`. Update `firestore.rules` and `tests/rules` together.
+  `users/{uid}/cards/{itemId}`. Update `firestore.rules` and `tests/rules` together, and deploy the rules with the change (see Workflow).
 - Item ids: `k:<kana>`, `v:<word>:<reading>`, `j:<kanji>`. Lesson ids: `kana-h-<row>-<n>`, `n5-v-<n>`, `n5-k-<n>`,
   `n5-g-<grammarId>` (N4: `n4-g4-<grammarId>`). **Changing ids or lesson sizes breaks saved progress** — avoid, or add a migration.
 - UI: colours are CSS variables in `globals.css` (light + `.dark`); chunky buttons use `.btn-3d` with `--shadow`.
@@ -95,7 +96,7 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
 - **Offline cache**: `src/app/sw.ts` never caches Google/Firebase hosts (`PRIVATE_HOSTS`) and drops the old
   `cross-origin` cache on activate. HTML pages are not precached (see Known issues); visited pages are cached on demand.
 - **Firestore**: every write is checked field by field (`firestore.rules`). Adding a field means updating the rules,
-  `tests/rules/firestore.rules.test.ts` and the sync code together.
+  `tests/rules/firestore.rules.test.ts` and the sync code together. The rules go live with `npm run deploy:rules` (see Workflow).
 - **Imports**: backups go through `parseBackup` (`src/lib/backup.ts`). The schema must follow the export format; keys
   such as `__proto__` are refused anywhere in the file.
 - **Deletion**: `deleteCloudData` and `deleteAccount` (`src/lib/sync.ts`) remove every collection listed in
@@ -178,6 +179,7 @@ npm run content        # regenerate src/content/generated from upstream datasets
 npm run icons          # regenerate PNG icons from public/icons/icon.svg
 npm run packs          # rebuild the offline knowledge packs in public/packs/v1 (needs network; cached in .cache/)
 npm run check:secrets  # fail if any tracked file holds a credential (the pre-commit hook checks staged changes)
+npm run deploy:rules   # deploy firestore.rules to FIREBASE_PROJECT_ID after the rules tests pass (add -- --check to run the gates only)
 ```
 
 In the Claude Code cloud sandbox Playwright's own browser isn't downloadable; prefix e2e commands with
@@ -200,10 +202,30 @@ In the Claude Code cloud sandbox Playwright's own browser isn't downloadable; pr
 6. **Pull request** — open a PR into `main` (only when the user asks Claude to), describing what changed and how it
    was tested. Check the Vercel preview deployment on iPhone and desktop.
 7. **Merge** — after review and green checks, merge the PR into `main`. Vercel then deploys production.
-8. **After merge** — if `firestore.rules` changed, deploy them:
-   `npx firebase deploy --only firestore:rules --project <firebase-project-id>`.
-   If new env vars were added, set them in Vercel and redeploy.
+8. **Rules deploy (automatic)** — when the change touches `firestore.rules`, deploy it as part of the change. See
+   [Firestore rules deploy](#firestore-rules-deploy-automatic). If new env vars were added, set them in Vercel and redeploy.
 9. **Follow-up work** — a merged branch is finished; start the next change from the updated `main` (step 1).
+
+### Firestore rules deploy (automatic)
+
+Claude deploys the rules as part of the change that modifies them. Nobody has to run the command by hand.
+
+1. **Trigger** — a change that touches `firestore.rules`, `firebase.json` or `tests/rules/`.
+2. **Commit first** — the deploy uses committed rules only. `npm run deploy:rules` refuses to run while
+   `firestore.rules` has uncommitted changes, so the live rules always match a commit.
+3. **Deploy** — run `FIREBASE_PROJECT_ID=<firebase-project-id> npm run deploy:rules`. The project id comes from the
+   environment, not from the repository. The script runs `npm run test:rules` first and stops if they fail, then runs
+   `firebase deploy --only firestore:rules`.
+4. **Credential** — the Firebase CLI reads `FIREBASE_TOKEN` from the session environment. Create the token on a trusted
+   machine with `npx firebase login:ci`, and add it in the environment settings. Never paste it into the chat or commit
+   it. If the deploy stops with "Failed to authenticate", the token is missing or expired: ask the person to add a new
+   one. Do not work around it.
+5. **Report** — the changelog entry records the commit that was deployed, or the reason it could not be. A change that
+   changes the rules is not finished until they are live, or until the blocker is reported.
+
+- Until `main` exists on GitHub, the rules deploy from the feature branch once committed. After a merge to `main`, the
+  same rules are already live, so nothing else is needed unless the rules change again.
+- `npm run deploy:rules -- --check` runs every gate without deploying.
 
 ## Changelog
 
@@ -219,6 +241,25 @@ Format:
 - Verification: checks run and results
 - Notes: follow-ups, migrations, or manual steps (e.g. deploy rules, new env vars)
 ```
+
+### 2026-10-22 — Automatic Firestore rules deploy
+- Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
+- Changes:
+  - `npm run deploy:rules` deploys `firestore.rules` to the project named in `FIREBASE_PROJECT_ID`. It runs the rules tests
+    first, refuses to deploy uncommitted rules, and stops with the Firebase error when the login is missing. Adding
+    `-- --check` runs the same gates without deploying.
+  - The workflow deploys rules as part of each change that touches them, instead of after the merge (see "Firestore rules
+    deploy (automatic)" in the Workflow section).
+- Files: `scripts/deploy-rules.mjs` (new), `package.json`, `CLAUDE.md`
+- Verification: lint, typecheck and build pass; unit tests 133 of 133 pass; `npm run deploy:rules -- --check` passes
+  (rules tests 10 of 10, rules committed at `af93150`). A real deploy was attempted: the rules tests passed, then the
+  deploy stopped at "Failed to authenticate" before changing anything in the Firebase project.
+- Notes: **not deployed**. The rules changed in phases 1 and 3 are not live. The Firebase login stored in this sandbox
+  is no longer accepted, and no deploy credential is set in the environment. Google's auth and Firebase endpoints are
+  reachable from the sandbox, so the blocker is the credential. To finish: in the environment settings, add
+  `FIREBASE_TOKEN` (created with `npx firebase login:ci` on a trusted machine) and `FIREBASE_PROJECT_ID`, start a new
+  session, then run `npm run deploy:rules` and record the commit and result here. `main` does not exist on GitHub yet,
+  so the rules deploy from this branch.
 
 ### 2026-10-22 — Weekly review, achievements, tips and the Today card (phase 5)
 - Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
