@@ -1,7 +1,10 @@
 import { ALL_KANA } from "./kana";
-import { loadLevel } from "./loader";
+import { loadIndex, loadLevel } from "./loader";
 import type { PracticeMode } from "@/lib/lesson-engine";
+import { LEECH_LAPSES } from "@/lib/weekly";
+import type { SrsCard } from "@/lib/srs";
 import { LEVELS, type Level, type StudyItem } from "@/lib/types";
+import { useProgress } from "@/store/progress";
 
 export interface PracticeSet {
   id: string;
@@ -55,4 +58,26 @@ export const PRACTICE_SETS: PracticeSet[] = [
   ...LEVELS.map(kanjiSet),
 ];
 
-export const PRACTICE_BY_ID = new Map(PRACTICE_SETS.map((s) => [s.id, s]));
+/** Built from the learner's own cards. Opened from the weekly review, so they are not in the dojo grid. */
+const focusSet = (id: string, title: string, subtitle: string, pick: (card: SrsCard) => boolean): PracticeSet => ({
+  id,
+  title,
+  subtitle,
+  glyph: "!",
+  modes: ["pick", "reverse-pick", "input", "reverse-input"],
+  load: async () => {
+    const index = await loadIndex();
+    const cards = useProgress.getState().cards;
+    return [...index.values()].filter((item) => {
+      const card = cards[item.id];
+      return !!card && pick(card);
+    });
+  },
+});
+
+export const FOCUS_SETS: PracticeSet[] = [
+  focusSet("leeches", "Leeches", "Items that keep coming back wrong", (c) => c.lapses >= LEECH_LAPSES),
+  focusSet("confusions", "Mix-ups", "Items you picked the wrong answer for", (c) => (c.cf?.length ?? 0) > 0),
+];
+
+export const PRACTICE_BY_ID = new Map([...PRACTICE_SETS, ...FOCUS_SETS].map((s) => [s.id, s]));

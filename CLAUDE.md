@@ -37,6 +37,10 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
 | `src/content/stories.ts`, `src/app/story/page.tsx`, `src/components/story-player.tsx` | Twelve short dialogues (6 N5, 6 N4) at `/story` and `/story?id=<storyId>`: replies with feedback, then questions |
 | `src/components/grammar-reference.tsx` | Grammar tab of the Dictionary: every grammar point with its notes and sample sentences |
 | `src/lib/course-progress.ts` | Path pointer: the next lesson is the first unfinished one after the furthest completed lesson |
+| `src/lib/coaching.ts`, `src/content/tips.ts` | Coaching: the situations (due backlog, leeches, broken streak, low accuracy, mix-ups, idle, kana, steady, new) and the tips tied to each |
+| `src/lib/weekly.ts`, `src/app/weekly/page.tsx` | Weekly review at `/weekly`: last seven days, accuracy by level, leeches, mix-ups, weakest kana rows, next steps |
+| `src/lib/achievements.ts`, `src/components/achievements.tsx` | 38 achievements derived from progress; Profile shows them and a toast announces new ones |
+| `src/components/today-card.tsx`, `src/content/culture.ts` | Today card at the top of the path, and the culture notes it shows (one per day) |
 | `src/content/course.ts` | Builds sections → units → lessons (6 words / 4 kanji per lesson) |
 | `src/content/generated/*.json` | Generated JLPT vocab/kanji (do not edit by hand; run `npm run content`) |
 | `src/content/loader.ts` | Lazy loading of level data, lesson items and distractor pools |
@@ -137,6 +141,21 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
   reason. A listed entry that now matches fails the test, so the list stays current. Fix a wrong kana in the file that
   holds it; the audio reads that field.
 
+## Study features (phase 5)
+
+- Everything here is derived from progress (`lessons`, `cards`, `days`, `notes`, `settings`); nothing new is stored.
+  Achievements are a list in `src/lib/achievements.ts`, each with a value and a target. To add one, add an entry; the
+  unit test checks ids and targets.
+- Weekly accuracy is reviews that were not lapses, out of all reviews. A group with fewer than five reviews is not
+  shown. A leech has four or more lapses (`LEECH_LAPSES`).
+- "Fix leeches" and "Practise" open focus sets, `/practice/run?set=leeches` and `?set=confusions`, built from the cards
+  at the moment they open. They are in `FOCUS_SETS`, not in the dojo grid.
+- Tips: the first active situation in `TRIGGER_ORDER` decides the tip, and the tip changes daily within that situation.
+- Today card: the daily picks depend only on the date (`dailyIndex`). Word and kanji come from the N5 level data; the
+  proverb comes from the study packs and is left out when they are not available.
+- The achievement toast reads a last-seen list kept in `localStorage` on this device. The first visit records the
+  current achievements without a toast, so existing progress is not announced.
+
 ## Known issues
 
 - **Hydration mismatch (React #418), intermittent**: with the service worker active, roughly one browser-test run in
@@ -200,6 +219,28 @@ Format:
 - Verification: checks run and results
 - Notes: follow-ups, migrations, or manual steps (e.g. deploy rules, new env vars)
 ```
+
+### 2026-10-22 — Weekly review, achievements, tips and the Today card (phase 5)
+- Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
+- Changes:
+  - Today card at the top of the path: daily goal progress, the next lesson, reviews due, and a word, kanji, proverb and
+    culture note of the day. The picks change at midnight and stay the same through the day.
+  - Weekly review (Profile → Weekly review): the last seven days, accuracy by level, leeches with a "Fix leeches"
+    drill, items you mix up with a "Practise" drill, the weakest kana rows, up to three next steps and a tip.
+  - Achievements: 38 derived from progress, shown on Profile. A toast announces an achievement the first time it
+    unlocks, and the last-seen list is kept on this device.
+  - Tips: 75, each tied to a situation such as a due backlog, leeches, a broken streak or low accuracy. The most urgent
+    situation decides the tip.
+  - Culture notes: 45, one per day on the home screen.
+- Files: `src/lib/coaching.ts`, `src/lib/weekly.ts`, `src/lib/achievements.ts` (new), `src/content/tips.ts` (new),
+  `src/content/culture.ts` (new), `src/components/today-card.tsx` (new), `src/components/achievements.tsx` (new),
+  `src/app/weekly/page.tsx` (new), `src/content/practice-sets.ts` (focus sets), `src/components/learning-path.tsx`,
+  `src/app/(tabs)/profile/page.tsx`, `tests/unit/achievements.test.ts`, `tests/unit/weekly.test.ts`,
+  `tests/unit/coaching.test.ts` (all new), `tests/e2e/app.spec.ts`, `CLAUDE.md`
+- Verification: `check:secrets`, `lint` and `typecheck` clean; `npm test` 133 tests in 16 files pass; `npm run build`
+  passes; `test:e2e` 20 of 20 pass on iPhone and desktop; `test:sync` 3 of 3 pass on desktop.
+- Notes: no storage or rules change and no migration. Smaller than the plan: 75 tips (plan ≈150), 45 culture notes
+  (plan ≈60), 38 achievements (plan ≈40). Adding more is a content-only change in `tips.ts` and `culture.ts`.
 
 ### 2026-10-22 — Grammar reference, stories and path pointer (phase 4)
 - Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed

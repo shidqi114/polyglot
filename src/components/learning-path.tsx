@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { BookOpen, Check, ChevronDown, Crown, Lock, Puzzle, Star } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, cn, ProgressBar } from "./ui";
+import { TodayCard } from "./today-card";
 import { COURSE } from "@/content/course";
 import { lessonStatus, pathPointer, type LessonStatus, type PathPointer } from "@/lib/course-progress";
 import type { LessonRef, Section, Unit } from "@/lib/types";
@@ -212,6 +213,7 @@ export function LearningPath() {
   let colorIdx = 0;
   return (
     <div className="pb-10">
+      <TodayCard nextId={currentId} />
       {currentId == null && (
         <div className="mb-6 rounded-2xl bg-gold p-5 text-center font-extrabold text-white">
           お疲れ様！ You finished the whole course. 🎉

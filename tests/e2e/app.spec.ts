@@ -90,7 +90,7 @@ test("practice, profile and settings work on every screen size", async ({ page }
   await expectNoHorizontalScroll(page);
 
   await page.goto("/profile");
-  await expect(page.getByRole("main").getByText("Daily goal")).toBeVisible();
+  await expect(page.getByRole("main").getByText("Daily goal", { exact: true })).toBeVisible();
   await expect(page.getByText("Offline study content")).toBeVisible();
 
   await page.getByRole("button", { name: "Dark" }).click();
@@ -156,4 +156,26 @@ test("a story plays from the practice page to its summary", async ({ page }) => 
   await next();
   await expect(page.getByText("Replies right first time: 1 of 2")).toBeVisible();
   await expect(page.getByText("Questions right: 2 of 2")).toBeVisible();
+});
+
+test("the home screen shows today's plan and a culture note", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByText("Word of the day")).toBeVisible();
+  await expect(page.getByText(/^Culture · /)).toBeVisible();
+  await expectNoHorizontalScroll(page);
+  await shot(page, "today");
+});
+
+test("weekly review and achievements are reachable from profile", async ({ page }) => {
+  await page.goto("/profile");
+  await expect(page.getByText(/\d+ of \d+ unlocked/)).toBeVisible();
+  await page.getByRole("link", { name: /Weekly review/ }).click();
+  await expect(page.getByRole("heading", { name: "Weekly review" })).toBeVisible();
+  await expect(page.getByText("Next steps")).toBeVisible();
+  await expectNoHorizontalScroll(page);
+  await shot(page, "weekly");
+
+  // A new account has no leeches, so the focus drill explains how to get some.
+  await page.goto("/practice/run?set=leeches&mode=pick");
+  await expect(page.getByText(/Learn a few more items/)).toBeVisible();
 });

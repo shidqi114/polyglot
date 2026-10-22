@@ -6,6 +6,7 @@ import { useRef, useState, type ReactNode } from "react";
 import { Button, Card, cn, Toggle } from "@/components/ui";
 import { addDays, dayKey } from "@/lib/dates";
 import { parseBackup } from "@/lib/backup";
+import { AchievementsCard } from "@/components/achievements";
 import { OfflineContent } from "@/components/offline-content";
 import { firebaseConfigured, signInWithGoogle, signOut } from "@/lib/firebase";
 import { deleteAccount, deleteCloudData, syncNow, useAuth } from "@/lib/sync";
@@ -315,6 +316,19 @@ export default function ProfilePage() {
         <div className="mb-3 font-extrabold">Activity</div>
         <Activity />
       </Card>
+
+      <Link
+        href="/weekly"
+        className="btn-3d flex items-center justify-between rounded-2xl border-2 border-border bg-surface p-4 hover:bg-surface-2"
+      >
+        <div>
+          <div className="font-extrabold">Weekly review</div>
+          <div className="text-sm text-muted">Your week, leeches, mix-ups and next steps</div>
+        </div>
+        <span className="text-sm font-extrabold uppercase text-blue">Open</span>
+      </Link>
+
+      <AchievementsCard />
 
       <Card className="divide-y-2 divide-border py-1">
         <Row title="Daily goal" hint="XP per day">
