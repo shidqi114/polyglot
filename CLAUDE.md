@@ -9,7 +9,7 @@ Polyglot is a personal, Duolingo-style **Japanese learning web app** (PWA). It r
 from Safari (Add to Home Screen). It is deployed on **Vercel**; progress can sync through **Firebase Auth (Google) +
 Firestore**.
 
-- Path: Hiragana → Katakana → JLPT N5 → N4 → N3 → N2 → N1 (≈210 kana, ≈8,000 words, ≈2,200 kanji, 12 N5 grammar lessons)
+- Path: Hiragana → Katakana → JLPT N5 → N4 → N3 → N2 → N1 (≈210 kana, ≈8,000 words, ≈2,200 kanji, 26 N5 and 16 N4 grammar lessons, 12 stories)
 - Exercises: intro cards, multiple choice (both directions), listening (TTS), typing (romaji → kana), match pairs,
   sentence builder, particle fill-in, kanji readings
 - Spaced repetition (FSRS) review, practice dojo, dictionary, XP / daily goal / streaks, light & dark themes
@@ -32,7 +32,11 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
 | `src/app/practice/run/page.tsx` | Practice session, `/practice/run?set=<id>&mode=<mode>[&learned=1]` |
 | `src/app/sw.ts`, `src/app/manifest.ts` | Service worker (offline) and PWA manifest |
 | `src/components/` | App shell, learning path, stats panel, UI primitives, `lesson/` player + exercise components |
-| `src/content/kana.ts`, `grammar.ts` | Hand-written kana table and N5 grammar lessons |
+| `src/content/kana.ts` | Hand-written kana table |
+| `src/content/grammar.ts`, `grammar-n4.ts` | Hand-written grammar points: N5 (26) and N4 (16). Each has notes, examples and sentences for the sentence builder |
+| `src/content/stories.ts`, `src/app/story/page.tsx`, `src/components/story-player.tsx` | Twelve short dialogues (6 N5, 6 N4) at `/story` and `/story?id=<storyId>`: replies with feedback, then questions |
+| `src/components/grammar-reference.tsx` | Grammar tab of the Dictionary: every grammar point with its notes and sample sentences |
+| `src/lib/course-progress.ts` | Path pointer: the next lesson is the first unfinished one after the furthest completed lesson |
 | `src/content/course.ts` | Builds sections → units → lessons (6 words / 4 kanji per lesson) |
 | `src/content/generated/*.json` | Generated JLPT vocab/kanji (do not edit by hand; run `npm run content`) |
 | `src/content/loader.ts` | Lazy loading of level data, lesson items and distractor pools |
@@ -55,7 +59,7 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
 | `next.config.ts` | Security headers and Content-Security-Policy, production guard for the emulator switch, PWA config |
 | `.github/workflows/ci.yml`, `.github/dependabot.yml` | CI (checks, browser tests, emulator tests) and dependency updates |
 | `docs/SETUP.md` | Firebase + Vercel + iPhone setup guide for the user |
-| `tests/unit`, `tests/rules`, `tests/e2e` | Unit tests, Firestore rules tests, Playwright tests (`sync.spec.ts` needs emulators) |
+| `tests/unit`, `tests/rules`, `tests/e2e` | Unit tests, Firestore rules tests, Playwright tests (`sync.spec.ts` needs emulators). `tests/unit/support/kuromoji.ts` is the shared reader for the sentence-reading checks |
 
 ## Key conventions
 
@@ -65,7 +69,7 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
 - Firestore layout: `users/{uid}` (settings), `users/{uid}/days/{YYYY-MM-DD}`, `users/{uid}/lessons/{id}`,
   `users/{uid}/cards/{itemId}`. Update `firestore.rules` and `tests/rules` together.
 - Item ids: `k:<kana>`, `v:<word>:<reading>`, `j:<kanji>`. Lesson ids: `kana-h-<row>-<n>`, `n5-v-<n>`, `n5-k-<n>`,
-  `n5-g-<grammarId>`. **Changing ids or lesson sizes breaks saved progress** — avoid, or add a migration.
+  `n5-g-<grammarId>` (N4: `n4-g4-<grammarId>`). **Changing ids or lesson sizes breaks saved progress** — avoid, or add a migration.
 - UI: colours are CSS variables in `globals.css` (light + `.dark`); chunky buttons use `.btn-3d` with `--shadow`.
   Japanese text uses the `.jp` class. Layout must work at 390px wide (iPhone) and on desktop with no horizontal scroll.
 - Content licensing: vocabulary/kanji data is CC BY-SA 4.0 (EDRDG) via MIT-licensed converters. The knowledge packs add
@@ -118,6 +122,20 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
   `users/{uid}/notes/{itemId}`; an empty note is written as a tombstone so other devices learn it was cleared.
 - Vocabulary lessons add up to two cloze questions, and the dojo has Sentences and Verb forms modes. Both need the
   study packs (Profile → Offline study content, or an online load).
+
+## Study features (phase 4)
+
+- Grammar: N5 (`grammar.ts`) and N4 (`grammar-n4.ts`) points each become one lesson, `<level>-<grammarId>`. The lessons
+  are spread evenly over the level's units in `course.ts`, so every point is on the path and keeps its order.
+- Path pointer (`src/lib/course-progress.ts`): "current" is the first unfinished lesson after the furthest completed
+  one. A lesson added to a unit you already passed shows as open, not as the next lesson. Only when nothing after that
+  point is unfinished does it fall back to the earliest gap.
+- Stories (`src/content/stories.ts`): a wrong reply gets its feedback and can be retried, but it does not count as right
+  first time. Comprehension questions show the answer straight away. Progress is not stored, so a replay starts again.
+- Sentence readings: `grammar.test.ts` and `stories.test.ts` run each Japanese line through kuromoji and compare the
+  reading with the written kana, ignoring long-vowel spelling. Each known variant is listed in its test file with a
+  reason. A listed entry that now matches fails the test, so the list stays current. Fix a wrong kana in the file that
+  holds it; the audio reads that field.
 
 ## Known issues
 
@@ -182,6 +200,32 @@ Format:
 - Verification: checks run and results
 - Notes: follow-ups, migrations, or manual steps (e.g. deploy rules, new env vars)
 ```
+
+### 2026-10-22 — Grammar reference, stories and path pointer (phase 4)
+- Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
+- Changes:
+  - N5 grammar grows from 12 to 26 points and N4 adds 16. Every point is a lesson on the path. The grammar lessons
+    are spread evenly over each level's units, so the two N5 points that were not on the path now are.
+  - Dictionary → Grammar tab: browse every grammar point with its notes, sample sentences and audio.
+  - Practice → Stories: 12 short dialogues (6 N5, 6 N4). Pick what to say (a wrong pick gets feedback and can be
+    retried), then answer comprehension questions. The summary counts replies right first time and questions right.
+  - Path: "current" is the first unfinished lesson after the furthest completed one, so a lesson added to a unit you
+    already passed shows as open instead of pulling you back.
+  - Fix: one N4 sentence (母は…言っていました) was missing its は in the kana, so its audio was also wrong.
+- Files: `src/content/grammar.ts`, `src/content/grammar-n4.ts` (new), `src/content/stories.ts` (new),
+  `src/content/course.ts`, `src/lib/course-progress.ts`, `src/components/learning-path.tsx`,
+  `src/components/grammar-reference.tsx` (new), `src/components/story-player.tsx` (new), `src/app/story/page.tsx` (new),
+  `src/app/(tabs)/dictionary/page.tsx`, `src/app/(tabs)/practice/page.tsx`, `tests/unit/course-progress.test.ts` (new),
+  `tests/unit/grammar.test.ts` (new), `tests/unit/stories.test.ts` (new), `tests/unit/support/kuromoji.ts` (new),
+  `tests/unit/content.test.ts`, `tests/e2e/app.spec.ts`, `CLAUDE.md`
+- Verification: `check:secrets`, `lint` and `typecheck` clean; `npm test` 107 tests in 13 files pass, including the
+  kuromoji reading check of every grammar and story sentence; `npm run build` passes; `test:e2e` 16 of 16 pass on iPhone
+  and desktop; `test:sync` 3 of 3 pass on desktop. `firestore.rules`, `sync.ts`, `firebase.ts` and `progress.ts` are
+  unchanged, so `test:rules` was not run.
+- Notes: no migration. Lesson ids are unchanged and progress is keyed by id, so saved progress carries over; only the
+  positions of grammar lessons on the path changed. Smaller than the plan: 26 N5 points (plan ≈45), 16 N4 (plan ≈55)
+  and 12 stories (plan ≈24). Stories are reached from Practice rather than placed on the path, and they do not store
+  progress or sync. Reviewed kuromoji readings are listed with reasons in `grammar.test.ts` and `stories.test.ts`.
 
 ### 2026-10-22 — Stage graph label files with the graph refresh
 - Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed

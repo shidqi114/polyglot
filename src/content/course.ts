@@ -1,5 +1,6 @@
 import counts from "./generated/counts.json";
 import { GRAMMAR } from "./grammar";
+import { GRAMMAR_N4 } from "./grammar-n4";
 import { KANA_ROWS } from "./kana";
 import { LEVELS, type Level, type LessonRef, type Section, type Unit } from "@/lib/types";
 
@@ -81,16 +82,23 @@ function levelSection(level: Level): Section {
       range: [i, Math.min(i + KANJI_PER_LESSON, c.kanji)],
     });
   }
-  const grammarLessons: LessonRef[] =
-    level === "n5"
-      ? GRAMMAR.map((g) => ({ id: `n5-${g.id}`, title: g.title, kind: "grammar", level, grammarId: g.id }))
-      : [];
+  const grammarSource = level === "n5" ? GRAMMAR : level === "n4" ? GRAMMAR_N4 : [];
+  const grammarLessons: LessonRef[] = grammarSource.map((g) => ({
+    id: `${level}-${g.id}`,
+    title: g.title,
+    kind: "grammar",
+    level,
+    grammarId: g.id,
+  }));
 
   const vocabUnits = chunk(vocabLessons, LEVEL_INFO[level].vocabPerUnit);
   const kanjiPerUnit = Math.ceil(kanjiLessons.length / vocabUnits.length);
+  // Spread the grammar points evenly over the units, so every point is on the path and keeps its order.
+  const grammarIn = (ui: number) =>
+    grammarLessons.filter((_, k) => Math.floor((k * vocabUnits.length) / grammarLessons.length) === ui);
   const units: Unit[] = vocabUnits.map((vocab, ui) => {
     const kanji = kanjiLessons.slice(ui * kanjiPerUnit, (ui + 1) * kanjiPerUnit);
-    const grammar = grammarLessons[ui] ? [grammarLessons[ui]] : [];
+    const grammar = grammarIn(ui);
     const half = Math.ceil(vocab.length / 2);
     return {
       id: `${level}-u${ui + 1}`,

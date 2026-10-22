@@ -56,6 +56,16 @@ export default function PracticePage() {
             <span className="text-sm font-extrabold uppercase text-blue">Start</span>
           </Link>
         ))}
+        <Link
+          href="/story"
+          className="btn-3d flex items-center justify-between rounded-2xl border-2 border-border bg-surface p-4 hover:bg-surface-2"
+        >
+          <div>
+            <div className="font-extrabold">Stories</div>
+            <div className="text-sm text-muted">Short conversations: choose what to say, then answer questions</div>
+          </div>
+          <span className="text-sm font-extrabold uppercase text-blue">Open</span>
+        </Link>
       </div>
     </div>
   );

@@ -4,12 +4,37 @@ import { ArrowLeft, Search } from "lucide-react";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { isRomaji, toHiragana } from "wanakana";
 import { AudioButton, KanjiReadings } from "@/components/lesson/exercises";
+import { GrammarReference } from "@/components/grammar-reference";
 import { WordPanel } from "@/components/word/word-panel";
 import { Card, cn } from "@/components/ui";
 import { loadIndex } from "@/content/loader";
 import { strengthBars } from "@/lib/srs";
 import type { StudyItem } from "@/lib/types";
 import { useProgress } from "@/store/progress";
+
+type Tab = "words" | "grammar";
+
+function DictionaryTabs({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void }) {
+  return (
+    <div role="tablist" className="grid grid-cols-2 gap-1 rounded-2xl bg-surface-2 p-1">
+      {(["words", "grammar"] as const).map((t) => (
+        <button
+          key={t}
+          type="button"
+          role="tab"
+          aria-selected={tab === t}
+          onClick={() => onChange(t)}
+          className={cn(
+            "rounded-xl py-2 text-sm font-extrabold uppercase",
+            tab === t ? "bg-surface text-blue shadow-sm" : "text-muted",
+          )}
+        >
+          {t === "words" ? "Words" : "Grammar"}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 function search(items: StudyItem[], raw: string): StudyItem[] {
   const q = raw.trim().toLowerCase();
@@ -115,6 +140,7 @@ export default function DictionaryPage() {
   const [all, setAll] = useState<StudyItem[] | null>(null);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<StudyItem | null>(null);
+  const [tab, setTab] = useState<Tab>("words");
   const deferred = useDeferredValue(query);
 
   useEffect(() => {
@@ -138,9 +164,19 @@ export default function DictionaryPage() {
       />
     );
 
+  if (tab === "grammar")
+    return (
+      <div className="flex flex-col gap-4">
+        <h1 className="text-2xl font-black">Dictionary</h1>
+        <DictionaryTabs tab={tab} onChange={setTab} />
+        <GrammarReference />
+      </div>
+    );
+
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-black">Dictionary</h1>
+      <DictionaryTabs tab={tab} onChange={setTab} />
       <label className="flex items-center gap-3 rounded-2xl border-2 border-border bg-surface-2 px-4 focus-within:border-blue">
         <Search className="h-5 w-5 text-muted" />
         <input

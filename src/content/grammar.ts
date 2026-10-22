@@ -1,4 +1,5 @@
 import type { GrammarLesson } from "@/lib/types";
+import { GRAMMAR_N4 } from "./grammar-n4";
 
 /** Hand-written N5 grammar lessons. Tiles are split at word/particle boundaries. */
 export const GRAMMAR: GrammarLesson[] = [
@@ -247,8 +248,200 @@ export const GRAMMAR: GrammarLesson[] = [
       { tiles: ["ねこ", "が", "大好き", "です"], kana: "ねこがだいすきです", en: "I love cats." },
     ],
   },
+  {
+    id: "g-kosoado",
+    title: "この・その・あの・どの + noun",
+    notes: [
+      "この (this), その (that, near the listener), あの (that, over there) and どの (which) come before a noun: この本.",
+    ],
+    examples: [{ jp: "この本は高いです。", en: "This book is expensive." }],
+    sentences: [
+      { tiles: ["この", "本", "は", "高い", "です"], kana: "このほんはたかいです", en: "This book is expensive." },
+      { tiles: ["あの", "人", "は", "先生", "です"], kana: "あのひとはせんせいです", en: "That person is a teacher." },
+      { tiles: ["その", "ペン", "は", "わたし", "の", "です"], kana: "そのペンはわたしのです", en: "That pen is mine." },
+      { tiles: ["どの", "傘", "が", "あなた", "の", "ですか"], kana: "どのかさがあなたのですか", en: "Which umbrella is yours?" },
+    ],
+  },
+  {
+    id: "g-counters",
+    title: "Counters",
+    notes: [
+      "Numbers take a counter that matches the thing counted: 〜つ (general, up to ten), 〜人 (people), 〜本 (long things), 〜枚 (flat things), 〜冊 (books), 〜匹 (small animals).",
+    ],
+    examples: [{ jp: "りんごを三つ買いました。", en: "I bought three apples." }],
+    sentences: [
+      { tiles: ["りんご", "を", "三つ", "買いました"], kana: "りんごをみっつかいました", en: "I bought three apples." },
+      { tiles: ["友だち", "が", "二人", "来ます"], kana: "ともだちがふたりきます", en: "Two friends are coming." },
+      { tiles: ["本", "を", "一冊", "読みました"], kana: "ほんをいっさつよみました", en: "I read one book." },
+      { tiles: ["ねこ", "が", "三匹", "います"], kana: "ねこがさんびきいます", en: "There are three cats." },
+    ],
+  },
+  {
+    id: "g-question-words",
+    title: "Question words",
+    notes: [
+      "何 (なに/なん) what, 誰 (だれ) who, どこ where, いつ when, どう how, なぜ or どうして why.",
+      "Put the question word where the answer would go. か at the end turns a statement into a question.",
+    ],
+    examples: [{ jp: "これは何ですか。", en: "What is this?" }],
+    sentences: [
+      { tiles: ["これ", "は", "何", "です", "か"], kana: "これはなんですか", en: "What is this?" },
+      { tiles: ["どこ", "へ", "行き", "ます", "か"], kana: "どこへいきますか", en: "Where are you going?" },
+      { tiles: ["いつ", "来ます", "か"], kana: "いつきますか", en: "When will you come?" },
+      { tiles: ["だれ", "と", "行きました", "か"], kana: "だれといきましたか", en: "Who did you go with?" },
+    ],
+  },
+  {
+    id: "g-deshita",
+    title: "でした — past of です",
+    notes: [
+      "The past of です is でした. The negative past is じゃありませんでした.",
+    ],
+    examples: [{ jp: "昨日は雨でした。", en: "It rained yesterday." }],
+    sentences: [
+      { tiles: ["昨日", "は", "雨", "でした"], kana: "きのうはあめでした", en: "It rained yesterday." },
+      { tiles: ["わたし", "は", "学生", "じゃ", "ありませんでした"], kana: "わたしはがくせいじゃありませんでした", en: "I was not a student." },
+      { tiles: ["日曜日", "は", "休み", "でした"], kana: "にちようびはやすみでした", en: "Sunday was a day off." },
+    ],
+  },
+  {
+    id: "g-adj-past",
+    title: "Past and negative of adjectives",
+    notes: [
+      "い-adjectives: drop い and add かった (past) or くない (negative): 高い → 高かった, 高くない.",
+      "な-adjectives use でした and じゃありません: 静か → 静かでした.",
+    ],
+    examples: [{ jp: "映画はおもしろかったです。", en: "The movie was interesting." }],
+    sentences: [
+      { tiles: ["映画", "は", "おもしろかった", "です"], kana: "えいがはおもしろかったです", en: "The movie was interesting." },
+      { tiles: ["今日", "は", "寒くない", "です"], kana: "きょうはさむくないです", en: "Today is not cold." },
+      { tiles: ["部屋", "は", "静か", "でした"], kana: "へやはしずかでした", en: "The room was quiet." },
+      { tiles: ["料理", "は", "おいしく", "なかった", "です"], kana: "りょうりはおいしくなかったです", en: "The food was not delicious." },
+    ],
+  },
+  {
+    id: "g-teiru",
+    title: "〜ています — doing now, or a state",
+    notes: [
+      "Verb て-form + います shows an action in progress: 食べています (is eating).",
+      "It also describes a state that follows a change: 住んでいます (lives), 知っています (knows).",
+    ],
+    examples: [{ jp: "今、本を読んでいます。", en: "I am reading a book now." }],
+    sentences: [
+      { tiles: ["今", "本", "を", "読んで", "います"], kana: "いまほんをよんでいます", en: "I am reading a book now." },
+      { tiles: ["雨", "が", "降って", "います"], kana: "あめがふっています", en: "It is raining." },
+      { tiles: ["友だち", "は", "日本語", "を", "勉強", "して", "います"], kana: "ともだちはにほんごをべんきょうしています", en: "My friend is studying Japanese." },
+      { tiles: ["わたし", "は", "東京", "に", "住んで", "います"], kana: "わたしはとうきょうにすんでいます", en: "I live in Tokyo." },
+    ],
+  },
+  {
+    id: "g-mashou",
+    title: "〜ましょう — let's",
+    notes: [
+      "Verb stem + ましょう suggests doing something together: 行きましょう (let's go).",
+      "Yes: はい、行きましょう. Politely declining: すみません、ちょっと…",
+    ],
+    examples: [{ jp: "いっしょにご飯を食べましょう。", en: "Let's eat together." }],
+    sentences: [
+      { tiles: ["いっしょに", "映画", "を", "見ましょう"], kana: "いっしょにえいがをみましょう", en: "Let's watch a movie together." },
+      { tiles: ["少し", "休みましょう"], kana: "すこしやすみましょう", en: "Let's take a short break." },
+      { tiles: ["もう", "帰りましょう"], kana: "もうかえりましょう", en: "Let's go home now." },
+      { tiles: ["どこ", "で", "会いましょう", "か"], kana: "どこであいましょうか", en: "Where shall we meet?" },
+    ],
+  },
+  {
+    id: "g-yo-ne",
+    title: "よ and ね — sentence endings",
+    notes: [
+      "よ tells the listener something new, or gives a firm opinion.",
+      "ね asks for agreement or shares a feeling: いい天気ですね (nice weather, isn't it?).",
+    ],
+    examples: [{ jp: "駅はあそこですよ。", en: "The station is over there, you know." }],
+    sentences: [
+      { tiles: ["いい", "天気", "です", "ね"], kana: "いいてんきですね", en: "Nice weather, isn't it?" },
+      { tiles: ["駅", "は", "あそこ", "です", "よ"], kana: "えきはあそこですよ", en: "The station is over there." },
+      { tiles: ["もう", "十時", "です", "よ"], kana: "もうじゅうじですよ", en: "It's already ten o'clock." },
+    ],
+  },
+  {
+    id: "g-ni-iku",
+    title: "Verb stem + に行きます — going to do",
+    notes: ["Verb stem + に行きます means “go to do something”: 買い物に行きます (I am going shopping)."],
+    examples: [{ jp: "映画を見に行きます。", en: "I am going to see a movie." }],
+    sentences: [
+      { tiles: ["買い物", "に", "行きます"], kana: "かいものにいきます", en: "I am going shopping." },
+      { tiles: ["映画", "を", "見", "に", "行きます"], kana: "えいがをみにいきます", en: "I am going to see a movie." },
+      { tiles: ["ご飯", "を", "食べ", "に", "来ました"], kana: "ごはんをたべにきました", en: "I came to eat." },
+      { tiles: ["友だち", "に", "会い", "に", "行きます"], kana: "ともだちにあいにいきます", en: "I am going to meet a friend." },
+    ],
+  },
+  {
+    id: "g-agemasu",
+    title: "あげます / もらいます / くれます — giving and receiving",
+    notes: [
+      "あげます: I give to someone else. もらいます: I receive from someone. くれます: someone gives to me.",
+      "Mark the giver with に or から: 友だちに本をもらいました.",
+    ],
+    examples: [{ jp: "母が花をくれました。", en: "My mother gave me flowers." }],
+    sentences: [
+      { tiles: ["わたし", "は", "友だち", "に", "本", "を", "あげました"], kana: "わたしはともだちにほんをあげました", en: "I gave a book to my friend." },
+      { tiles: ["友だち", "に", "本", "を", "もらいました"], kana: "ともだちにほんをもらいました", en: "I received a book from my friend." },
+      { tiles: ["先生", "が", "辞書", "を", "くれました"], kana: "せんせいがじしょをくれました", en: "The teacher gave me a dictionary." },
+      { tiles: ["これ", "は", "あなた", "に", "あげます"], kana: "これはあなたにあげます", en: "I'll give this to you." },
+    ],
+  },
+  {
+    id: "g-kara",
+    title: "〜から — because",
+    notes: [
+      "〜から after a statement gives the reason: 時間がないから、行けません (I have no time, so I can't go).",
+    ],
+    examples: [{ jp: "忙しいから、行けません。", en: "I'm busy, so I can't go." }],
+    sentences: [
+      { tiles: ["時間", "が", "ない", "から", "行けません"], kana: "じかんがないからいけません", en: "I have no time, so I can't go." },
+      { tiles: ["寒い", "から", "コート", "を", "着ます"], kana: "さむいからコートをきます", en: "It's cold, so I'll wear a coat." },
+      { tiles: ["日本語", "が", "好き", "だから", "勉強", "します"], kana: "にほんごがすきだからべんきょうします", en: "I like Japanese, so I study it." },
+      { tiles: ["疲れた", "から", "休みます"], kana: "つかれたからやすみます", en: "I'm tired, so I'll rest." },
+    ],
+  },
+  {
+    id: "g-omoimasu",
+    title: "〜と思います — I think",
+    notes: [
+      "Plain form + と思います gives an opinion: 明日は雨だと思います (I think it will rain tomorrow).",
+      "The negative is 〜ないと思います (I don't think).",
+    ],
+    examples: [{ jp: "彼は来ないと思います。", en: "I don't think he'll come." }],
+    sentences: [
+      { tiles: ["明日", "は", "雨", "だと", "思います"], kana: "あしたはあめだとおもいます", en: "I think it will rain tomorrow." },
+      { tiles: ["これ", "は", "おいしい", "と", "思います"], kana: "これはおいしいとおもいます", en: "I think this is delicious." },
+      { tiles: ["彼", "は", "来ない", "と", "思います"], kana: "かれはこないとおもいます", en: "I don't think he will come." },
+    ],
+  },
+  {
+    id: "g-kedo",
+    title: "〜けど — but",
+    notes: ["けど (casual) and けれど (polite) join two statements: 行きたいけど、行けません (I want to go, but I can't)."],
+    examples: [{ jp: "高いけど、おいしいです。", en: "It's expensive, but it's delicious." }],
+    sentences: [
+      { tiles: ["行きたい", "けど", "行けません"], kana: "いきたいけどいけません", en: "I want to go, but I can't." },
+      { tiles: ["寒い", "けど", "がんばります"], kana: "さむいけどがんばります", en: "It's cold, but I'll do my best." },
+      { tiles: ["安い", "けど", "品質", "は", "いい", "です"], kana: "やすいけどひんしつはいいです", en: "It's cheap, but the quality is good." },
+    ],
+  },
+  {
+    id: "g-masen-ka",
+    title: "〜ませんか — would you like to",
+    notes: ["Verb stem + ませんか invites politely: 一緒に行きませんか (won't you go together?)."],
+    examples: [{ jp: "コーヒーを飲みませんか。", en: "Would you like some coffee?" }],
+    sentences: [
+      { tiles: ["コーヒー", "を", "飲みません", "か"], kana: "コーヒーをのみませんか", en: "Would you like some coffee?" },
+      { tiles: ["明日", "いっしょに", "映画", "を", "見ませんか"], kana: "あしたいっしょにえいがをみませんか", en: "Would you like to watch a movie with me tomorrow?" },
+      { tiles: ["ちょっと", "休みませんか"], kana: "ちょっとやすみませんか", en: "Shall we take a short break?" },
+    ],
+  },
 ];
 
-export const GRAMMAR_BY_ID = new Map(GRAMMAR.map((g) => [g.id, g]));
+export const GRAMMAR_BY_ID = new Map([...GRAMMAR, ...GRAMMAR_N4].map((g) => [g.id, g]));
 
 export const PARTICLES = new Set(["は", "が", "を", "に", "で", "へ", "と", "も", "の", "か", "ね", "から", "まで", "よ"]);

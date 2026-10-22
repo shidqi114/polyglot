@@ -1,7 +1,4 @@
 {
-  "0": "Content model and course data",
-  "1": "Progress, sync and spaced repetition",
-  "2": "App layout and providers",
   "3": "Project documentation",
   "4": "Lesson exercises and dictionary UI",
   "7": "Build scripts and secret scanner",
@@ -18,6 +15,5 @@
   "19": "PostCSS configuration",
   "20": "UI conventions",
   "21": "Git hooks",
-  "22": "App shell and tab navigation",
   "23": "Dependency overrides"
 }

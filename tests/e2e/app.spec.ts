@@ -111,3 +111,49 @@ test("grammar lesson sentence builder", async ({ page }) => {
   await page.getByRole("button", { name: "Check" }).click();
   await expect(page.getByText(/Nice!|Great job!|Correct!|Awesome!|すごい！|Excellent!|いいね！/)).toBeVisible();
 });
+
+test("dictionary grammar reference lists N5 and N4 points and opens one", async ({ page }) => {
+  await page.goto("/dictionary");
+  await page.getByRole("tab", { name: "Grammar" }).click();
+  await expect(page.getByText("JLPT N5 · 26 points")).toBeVisible();
+  await expect(page.getByText("JLPT N4 · 16 points")).toBeVisible();
+  await expectNoHorizontalScroll(page);
+  await shot(page, "grammar-reference");
+  await page.getByRole("button", { name: /〜てから — after doing/ }).click();
+  await expect(page.getByText("Sample sentences")).toBeVisible();
+  await expectNoHorizontalScroll(page);
+  await page.getByRole("button", { name: "Grammar", exact: true }).click();
+  await expect(page.getByText("JLPT N4 · 16 points")).toBeVisible();
+});
+
+test("a story plays from the practice page to its summary", async ({ page }) => {
+  await page.goto("/practice");
+  await page.getByRole("link", { name: /Stories/ }).click();
+  await expect(page.getByRole("heading", { name: "Stories" })).toBeVisible();
+  await page.getByRole("link", { name: /コンビニで/ }).click();
+  await expect(page.getByRole("heading", { name: "コンビニで" })).toBeVisible();
+  await expectNoHorizontalScroll(page);
+  await shot(page, "story");
+
+  const next = () => page.getByRole("button", { name: "Next", exact: true }).click();
+  const cont = () => page.getByRole("button", { name: "Continue", exact: true }).click();
+  await next(); // いらっしゃいませ。
+  await next(); // お弁当は温めますか。
+  await page.getByRole("button", { name: /はい、お願いします/ }).click();
+  await cont();
+  await next(); // 袋はいりますか。
+  // A wrong first pick shows its feedback and can be retried, but it does not count as right first time.
+  await page.getByRole("button", { name: /いいえ、いります/ }).click();
+  await expect(page.getByText(/いります means/)).toBeVisible();
+  await page.getByRole("button", { name: /いいえ、いりません/ }).click();
+  await cont();
+  await next(); // 合計は六百五十円です。
+  await next(); // ありがとうございました。
+
+  await page.getByRole("button", { name: "Wanted it warmed", exact: true }).click();
+  await next();
+  await page.getByRole("button", { name: "650 yen", exact: true }).click();
+  await next();
+  await expect(page.getByText("Replies right first time: 1 of 2")).toBeVisible();
+  await expect(page.getByText("Questions right: 2 of 2")).toBeVisible();
+});

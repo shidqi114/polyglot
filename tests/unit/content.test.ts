@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ALL_LESSONS, COURSE } from "@/content/course";
 import { GRAMMAR, GRAMMAR_BY_ID } from "@/content/grammar";
+import { GRAMMAR_N4 } from "@/content/grammar-n4";
 import { ALL_KANA, KANA_BY_ID } from "@/content/kana";
 import { getLessonItems, loadIndex } from "@/content/loader";
 
@@ -19,10 +20,13 @@ describe("course", () => {
     for (const id of kanaIds) expect(KANA_BY_ID.has(id)).toBe(true);
   });
 
-  it("references every grammar lesson", () => {
-    const used = ALL_LESSONS.filter((l) => l.kind === "grammar").map((l) => l.grammarId);
-    expect(new Set(used)).toEqual(new Set(GRAMMAR.map((g) => g.id)));
-    for (const id of used) expect(GRAMMAR_BY_ID.has(id!)).toBe(true);
+  it("puts every N5 and N4 grammar point on the path, in order", () => {
+    const onPath = ALL_LESSONS.filter((l) => l.kind === "grammar");
+    expect(onPath.map((l) => l.grammarId)).toEqual([...GRAMMAR, ...GRAMMAR_N4].map((g) => g.id));
+    for (const l of onPath) {
+      expect(GRAMMAR_BY_ID.has(l.grammarId!)).toBe(true);
+      expect(l.id).toBe(`${l.level}-${l.grammarId}`);
+    }
   });
 
   it("every vocab and kanji lesson resolves to items with meanings", async () => {

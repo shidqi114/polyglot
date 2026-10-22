@@ -6,7 +6,7 @@ import { BookOpen, Check, ChevronDown, Crown, Lock, Puzzle, Star } from "lucide-
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, cn, ProgressBar } from "./ui";
 import { COURSE } from "@/content/course";
-import { currentLessonId, lessonStatus, type LessonStatus } from "@/lib/course-progress";
+import { lessonStatus, pathPointer, type LessonStatus, type PathPointer } from "@/lib/course-progress";
 import type { LessonRef, Section, Unit } from "@/lib/types";
 import { useProgress } from "@/store/progress";
 
@@ -122,14 +122,14 @@ function lessonDescription(l: LessonRef): string {
 function UnitBlock({
   unit,
   colorIdx,
-  currentId,
+  pointer,
   selectedId,
   setSelectedId,
   currentRef,
 }: {
   unit: Unit;
   colorIdx: number;
-  currentId?: string;
+  pointer: PathPointer;
   selectedId: string | null;
   setSelectedId: (id: string | null) => void;
   currentRef: React.Ref<HTMLDivElement>;
@@ -151,11 +151,11 @@ function UnitBlock({
             key={l.id}
             lesson={l}
             index={i}
-            status={lessonStatus(l.id, lessons, currentId)}
+            status={lessonStatus(l.id, lessons, pointer)}
             color={color}
             selected={selectedId === l.id}
             onSelect={() => setSelectedId(selectedId === l.id ? null : l.id)}
-            nodeRef={l.id === currentId ? currentRef : undefined}
+            nodeRef={l.id === pointer.currentId ? currentRef : undefined}
           />
         ))}
       </div>
@@ -198,7 +198,8 @@ function SectionHeader({
 
 export function LearningPath() {
   const lessons = useProgress((s) => s.lessons);
-  const currentId = currentLessonId(lessons);
+  const pointer = useMemo(() => pathPointer(lessons), [lessons]);
+  const currentId = pointer.currentId;
   const currentSection = COURSE.find((s) => s.units.some((u) => u.lessons.some((l) => l.id === currentId)))?.id;
   const [open, setOpen] = useState<Set<string>>(() => new Set(currentSection ? [currentSection] : []));
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -238,7 +239,7 @@ export function LearningPath() {
                   key={unit.id}
                   unit={unit}
                   colorIdx={colorIdx++}
-                  currentId={currentId}
+                  pointer={pointer}
                   selectedId={selectedId}
                   setSelectedId={setSelectedId}
                   currentRef={currentRef}
