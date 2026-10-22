@@ -1,0 +1,14 @@
+#!/bin/sh
+# Refresh the graphify code graph so every commit carries an up-to-date graph.
+# Code-only and offline: no LLM or API key is needed. Never blocks the commit.
+GRAPHIFY="$(command -v graphify 2>/dev/null || echo "$HOME/.local/bin/graphify")"
+if [ ! -x "$GRAPHIFY" ]; then
+  echo "graphify not installed; skipping graph refresh" >&2
+  exit 0
+fi
+if "$GRAPHIFY" update . >/dev/null 2>&1; then
+  git add graphify-out/graph.json graphify-out/GRAPH_REPORT.md graphify-out/graph.html graphify-out/manifest.json 2>/dev/null
+else
+  echo "graphify update failed; commit continues without a graph refresh" >&2
+fi
+exit 0

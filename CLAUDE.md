@@ -115,6 +115,21 @@ Format:
 - Notes: follow-ups, migrations, or manual steps (e.g. deploy rules, new env vars)
 ```
 
+### 2026-10-22 — Add graphify knowledge graph and commit hook
+- Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
+- Changes:
+  - Built a knowledge graph of the app code and docs in `graphify-out/` (466 nodes, 1,105 edges, 21 communities
+    labelled). Open `graphify-out/graph.html` in a browser, or read `graphify-out/GRAPH_REPORT.md`.
+  - `.graphifyignore` leaves out `.claude/` (third-party skills), `graphify-out/` and icon images.
+  - `scripts/git-hooks/pre-commit` refreshes the graph with `graphify update .` and stages it in the same commit.
+    Install it once per clone with `cp scripts/git-hooks/pre-commit .git/hooks/pre-commit`.
+- Files: `.graphifyignore`, `scripts/git-hooks/pre-commit`, `graphify-out/` (graph.json, GRAPH_REPORT.md, graph.html, manifest.json)
+- Verification: detection and extraction ran on 72 files; the three docs were extracted by a subagent and read to their
+  last line; the graph health check showed no integrity failures beyond normal parallel edges (2 dangling and 2
+  self-loop edges remain).
+- Notes: the graph's AMBIGUOUS edges are listed in GRAPH_REPORT.md for review. The pre-commit hook is not versioned
+  by git, so each clone must install it. Re-run `graphify update .` after changing code without committing.
+
 ### 2026-10-22 — Fix lesson popover layering and iOS full-screen Home Screen mode
 - Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
 - Changes:
