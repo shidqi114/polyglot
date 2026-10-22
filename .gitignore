@@ -56,3 +56,5 @@ firestore-debug.log
 firebase-debug.log
 ui-debug.log
 .next-sync/
+# Playwright CLI output (may contain credentials)
+.playwright-cli/
