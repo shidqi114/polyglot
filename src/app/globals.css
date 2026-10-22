@@ -1,0 +1,168 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f7f7f7;
+  --border: #e5e5e5;
+  --text: #3c3c3c;
+  --muted: #777777;
+  --primary: #58cc02;
+  --primary-dark: #58a700;
+  --primary-soft: #d7ffb8;
+  --blue: #1cb0f6;
+  --blue-dark: #1899d6;
+  --blue-soft: #ddf4ff;
+  --red: #ff4b4b;
+  --red-dark: #ea2b2b;
+  --red-soft: #ffdfe0;
+  --gold: #ffc800;
+  --gold-dark: #e5a400;
+  --purple: #ce82ff;
+  --orange: #ff9600;
+  --locked: #e5e5e5;
+  --locked-dark: #cecece;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #131f24;
+  --surface: #131f24;
+  --surface-2: #1b2b32;
+  --border: #37464f;
+  --text: #f1f7fb;
+  --muted: #8ea4ae;
+  --primary: #58cc02;
+  --primary-dark: #4a9c0a;
+  --primary-soft: #23361a;
+  --blue: #1cb0f6;
+  --blue-dark: #1590c9;
+  --blue-soft: #16313f;
+  --red: #ff4b4b;
+  --red-dark: #d93a3a;
+  --red-soft: #3a1f22;
+  --locked: #37464f;
+  --locked-dark: #2a383f;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-soft: var(--primary-soft);
+  --color-blue: var(--blue);
+  --color-blue-dark: var(--blue-dark);
+  --color-blue-soft: var(--blue-soft);
+  --color-red: var(--red);
+  --color-red-dark: var(--red-dark);
+  --color-red-soft: var(--red-soft);
+  --color-gold: var(--gold);
+  --color-gold-dark: var(--gold-dark);
+  --color-purple: var(--purple);
+  --color-orange: var(--orange);
+  --color-locked: var(--locked);
+  --color-locked-dark: var(--locked-dark);
+  --font-sans: "Nunito", ui-rounded, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Meiryo", "Noto Sans JP",
+    system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-jp: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "YuGothic", "Meiryo", "Noto Sans JP", "Noto Sans CJK JP",
+    sans-serif;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.jp {
+  font-family: var(--font-jp);
+  font-feature-settings: "palt" 0;
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Chunky 3D buttons in the spirit of Duolingo */
+.btn-3d {
+  box-shadow: 0 4px 0 var(--shadow, var(--border));
+  transition: transform 80ms, box-shadow 80ms, filter 120ms;
+}
+.btn-3d:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--shadow, var(--border));
+}
+.btn-3d:disabled {
+  cursor: not-allowed;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.96);
+  }
+  60% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.animate-pop {
+  animation: pop 200ms ease-out;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+.animate-shake {
+  animation: shake 250ms ease-in-out;
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+  50% {
+    transform: translate(-50%, -5px);
+  }
+}
+.animate-bob {
+  animation: bob 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}
