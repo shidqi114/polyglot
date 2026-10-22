@@ -13,7 +13,7 @@
     "content": "tsx scripts/build-content.ts",
     "icons": "node scripts/build-icons.mjs",
     "test:rules": "firebase emulators:exec --only firestore --project polyglot-rules-test \"vitest run --config vitest.rules.config.mts\"",
-    "test:sync": "SYNC_E2E=1 NEXT_PUBLIC_FIREBASE_EMULATOR=1 NEXT_PUBLIC_FIREBASE_API_KEY=demo-key NEXT_PUBLIC_FIREBASE_PROJECT_ID=demo-polyglot NEXT_PUBLIC_FIREBASE_APP_ID=demo-app NEXT_DIST_DIR=.next-sync PORT_E2E=3200 sh -c 'next build && firebase emulators:exec --only auth,firestore --project demo-polyglot \"playwright test tests/e2e/sync.spec.ts --project=desktop\"'",
+    "test:sync": "SYNC_E2E=1 ALLOW_EMULATOR_BUILD=1 NEXT_PUBLIC_FIREBASE_EMULATOR=1 NEXT_PUBLIC_FIREBASE_API_KEY=demo-key NEXT_PUBLIC_FIREBASE_PROJECT_ID=demo-polyglot NEXT_PUBLIC_FIREBASE_APP_ID=demo-app NEXT_DIST_DIR=.next-sync PORT_E2E=3200 sh -c 'next build && firebase emulators:exec --only auth,firestore --project demo-polyglot \"playwright test tests/e2e/sync.spec.ts --project=desktop\"'",
     "check:secrets": "node scripts/check-secrets.mjs --all",
     "prepare": "node scripts/install-hooks.mjs"
   },
@@ -28,6 +28,7 @@
     "react-dom": "19.1.0",
     "ts-fsrs": "^5.4.2",
     "wanakana": "^5.3.1",
+    "zod": "^4.6.7",
     "zustand": "^5.0.16"
   },
   "devDependencies": {
@@ -49,5 +50,9 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "overrides": {
+    "@grpc/grpc-js": "^1.13.6",
+    "postcss": "^8.5.23"
   }
 }

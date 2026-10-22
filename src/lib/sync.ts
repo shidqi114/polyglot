@@ -1,8 +1,9 @@
 "use client";
 
-import { onAuthStateChanged, type User } from "firebase/auth";
+import { deleteUser, onAuthStateChanged, type User } from "firebase/auth";
 import {
   collection,
+  deleteDoc,
   doc,
   getDocFromServer,
   getDocsFromServer,
@@ -15,7 +16,7 @@ import {
   type Firestore,
 } from "firebase/firestore";
 import { create } from "zustand";
-import { completeRedirectSignIn, getFirebase } from "./firebase";
+import { completeRedirectSignIn, getFirebase, signOut } from "./firebase";
 import type { SrsCard } from "./srs";
 import { useProgress, type DayStats, type LessonProgress, type Pending, type Settings } from "@/store/progress";
 
@@ -224,6 +225,45 @@ function adoptGuestData(uid: string) {
     lastPull: 0,
     pending: { days: { ...s.days }, lessons, cards, settings: s.settingsUp > 0 },
   });
+}
+
+const CLOUD_COLLECTIONS = ["days", "lessons", "cards", "notes"] as const;
+
+/** Removes every progress document of this account. The local copy is untouched until the caller resets it. */
+async function wipeCloudProgress(db: Firestore, uid: string): Promise<void> {
+  for (const name of CLOUD_COLLECTIONS) {
+    const snap = await getDocsFromServer(collection(db, `users/${uid}/${name}`));
+    for (let i = 0; i < snap.docs.length; i += BATCH_LIMIT) {
+      const batch = writeBatch(db);
+      for (const d of snap.docs.slice(i, i + BATCH_LIMIT)) batch.delete(d.ref);
+      await batch.commit();
+    }
+  }
+  await deleteDoc(doc(db, `users/${uid}`));
+}
+
+/** Deletes this account's cloud progress, then signs this device out and clears its local progress. */
+export async function deleteCloudData(): Promise<void> {
+  const fb = getFirebase();
+  const uid = currentUid;
+  if (!fb || !uid) throw new Error("Sign in first.");
+  await enqueue(() => wipeCloudProgress(fb.db, uid));
+  await signOut();
+  useProgress.getState().reset(null);
+}
+
+/**
+ * Deletes the cloud progress and the account. Firebase requires a recent sign-in for this, so if it
+ * answers auth/requires-recent-login the user signs in again and presses the button once more.
+ */
+export async function deleteAccount(): Promise<void> {
+  const fb = getFirebase();
+  const uid = currentUid;
+  const user = fb?.auth.currentUser;
+  if (!fb || !uid || !user) throw new Error("Sign in first.");
+  await enqueue(() => wipeCloudProgress(fb.db, uid));
+  await deleteUser(user);
+  useProgress.getState().reset(null);
 }
 
 export function startSync(): void {

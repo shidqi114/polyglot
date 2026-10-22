@@ -1,5 +1,6 @@
 // End-to-end sync test against the Firebase emulators: npm run test:sync
-import { expect, test, type Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { expect, test } from "./fixtures";
 import { playKanaLesson } from "./helpers";
 
 test.skip(!process.env.SYNC_E2E, "needs the Firebase emulators (npm run test:sync)");
@@ -55,4 +56,32 @@ test("guest progress merges into the account and syncs to a second device", asyn
   await expect(b.getByText("Guest")).toBeVisible();
   await b.goto("/");
   await expect(b.getByRole("button", { name: /Vowels \(current\)/ })).toBeVisible();
+});
+
+test("deleting cloud data removes it from Firestore and signs the device out", async ({ browser }) => {
+  const uid = `delete-${Date.now()}`;
+  const page = await (await browser.newContext()).newPage();
+  await page.goto("/");
+  await page.getByRole("button", { name: /Vowels \(current\)/ }).click();
+  await page.getByRole("button", { name: /Start \+10 XP/ }).click();
+  await playKanaLesson(page);
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.goto("/profile");
+  await signIn(page, uid);
+  await expect(page.getByText(/^Synced/)).toBeVisible({ timeout: 15_000 });
+
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "Delete cloud data" }).click();
+  await expect(page.getByText(/Cloud progress deleted/)).toBeVisible({ timeout: 15_000 });
+
+  // The emulator's admin view must show nothing left for this account.
+  for (const name of ["days", "lessons", "cards"]) {
+    const res = await page.request.get(
+      `http://127.0.0.1:8080/v1/projects/demo-polyglot/databases/(default)/documents/users/${uid}/${name}`,
+      { headers: { Authorization: "Bearer owner" } },
+    );
+    const body = (await res.json()) as { documents?: unknown[] };
+    expect(body.documents ?? [], name).toEqual([]);
+  }
+  await expect(page.getByText("Guest", { exact: true }).first()).toBeVisible();
 });

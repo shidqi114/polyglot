@@ -36,6 +36,7 @@ In Vercel → your project → **Settings → Environment Variables**, add (for 
 | `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | `storageBucket` |
 | `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | `messagingSenderId` |
 | `NEXT_PUBLIC_FIREBASE_APP_ID` | `appId` |
+| `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | optional: reCAPTCHA v3 site key for App Check (step 4b) |
 
 **Treat these values as secrets.** Do not paste them into the repository, commit them, or share them in chat or screenshots.
 They belong only in Vercel's environment variables and in your local `.env.local` file, which git ignores.
@@ -52,6 +53,18 @@ not keeping the config hidden, are what protect your data.)
 2. Under **OAuth 2.0 Client IDs**, open **Web client (auto created by Google Service)**.
 3. Under **Authorized redirect URIs**, add `https://YOUR_DOMAIN/__/auth/handler` and **Save**.
    (It can take a few minutes to take effect.)
+
+## 4b. Restrict the browser key and turn on App Check (recommended)
+
+The `apiKey` only identifies your project; it does not grant access to data, which the Firestore rules control.
+Restricting it still limits who can use it:
+
+1. Open <https://console.cloud.google.com/apis/credentials>, select the project, and open **Browser key (auto created by Firebase)**.
+2. Under **Application restrictions → Websites**, add `https://YOUR_DOMAIN/*`, `https://YOUR_DOMAIN/__/*` and `http://localhost:3000/*`.
+3. Under **API restrictions → Restrict key**, select **Identity Toolkit API**, **Token Service API**, **Cloud Firestore API** and **Firebase App Check API**. Save.
+4. Optional, App Check: in the Firebase console open **Build → App Check**, register the web app with **reCAPTCHA v3**, copy the site key into Vercel as `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, and redeploy. Check the metrics for a few days, then **Enforce** Cloud Firestore.
+
+The free Spark plan has no paid usage: once a quota is used up, requests fail until it resets, and nothing is billed.
 
 ## 5. Deploy the Firestore security rules
 

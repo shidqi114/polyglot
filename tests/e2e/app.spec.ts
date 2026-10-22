@@ -1,4 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { expect, test } from "./fixtures";
 import { playKanaLesson } from "./helpers";
 
 const SHOTS = process.env.SCREENSHOT_DIR;
@@ -13,6 +14,13 @@ async function expectNoHorizontalScroll(page: Page) {
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(1);
 }
+
+test("security headers are served on every page", async ({ request }) => {
+  const res = await request.get("/");
+  expect(res.headers()["content-security-policy"]).toContain("default-src 'self'");
+  expect(res.headers()["x-frame-options"]).toBe("DENY");
+  expect(res.headers()["cross-origin-opener-policy"]).toBe("same-origin-allow-popups");
+});
 
 test("learning path renders and a kana lesson can be completed", async ({ page }) => {
   await page.goto("/");

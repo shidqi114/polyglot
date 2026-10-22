@@ -5,9 +5,10 @@ import { Cloud, CloudOff, Download, Flame, LogOut, RefreshCw, Trophy, Upload, Za
 import { useRef, useState, type ReactNode } from "react";
 import { Button, Card, cn, Toggle } from "@/components/ui";
 import { addDays, dayKey } from "@/lib/dates";
+import { parseBackup } from "@/lib/backup";
 import { firebaseConfigured, signInWithGoogle, signOut } from "@/lib/firebase";
-import { syncNow, useAuth } from "@/lib/sync";
-import { streakOf, totalXp, useProgress, type ProgressData, type Settings } from "@/store/progress";
+import { deleteAccount, deleteCloudData, syncNow, useAuth } from "@/lib/sync";
+import { streakOf, totalXp, useProgress, type Settings } from "@/store/progress";
 
 function StatTile({ icon, value, label }: { icon: ReactNode; value: ReactNode; label: string }) {
   return (
@@ -173,13 +174,12 @@ function DataCard() {
 
   const importData = async (file: File) => {
     try {
-      const data = JSON.parse(await file.text()) as Partial<ProgressData> & { app?: string };
-      if (data.app !== "polyglot" || !data.lessons || !data.cards || !data.days) throw new Error("Not a Polyglot backup file");
+      const backup = parseBackup(await file.text());
       useProgress.getState().setData({
-        lessons: data.lessons,
-        cards: data.cards,
-        days: data.days,
-        settings: { ...useProgress.getState().settings, ...data.settings },
+        lessons: backup.lessons,
+        cards: backup.cards,
+        days: backup.days,
+        settings: { ...useProgress.getState().settings, ...backup.settings },
       });
       setMsg("Backup restored.");
     } catch (e) {
@@ -220,6 +220,65 @@ function DataCard() {
           Reset progress
         </button>
       )}
+      {msg && <p className="mt-2 text-sm text-muted">{msg}</p>}
+    </Card>
+  );
+}
+
+function DangerZone() {
+  const { user } = useAuth();
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  // Keep the message visible after sign-out, which is what deleting cloud data causes.
+  if (!user && !msg) return null;
+
+  const run = async (task: () => Promise<void>, done: string) => {
+    setBusy(true);
+    try {
+      await task();
+      setMsg(done);
+    } catch (e) {
+      const code = (e as { code?: string }).code;
+      setMsg(
+        code === "auth/requires-recent-login"
+          ? "For security, sign out, sign in with Google again, then delete the account."
+          : e instanceof Error
+            ? e.message
+            : "Something went wrong.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Card>
+      <div className="mb-1 font-extrabold text-red">Danger zone</div>
+      <p className="mb-3 text-sm text-muted">Removes your progress from the cloud and clears it from this device.</p>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <Button
+          variant="secondary"
+          disabled={busy || !user}
+          onClick={() => {
+            if (confirm("Delete all cloud progress? This device will be signed out and its progress cleared.")) {
+              void run(deleteCloudData, "Cloud progress deleted. This device was signed out.");
+            }
+          }}
+        >
+          Delete cloud data
+        </Button>
+        <Button
+          variant="danger"
+          disabled={busy || !user}
+          onClick={() => {
+            if (confirm("Delete your account and all its data? This cannot be undone.")) {
+              void run(deleteAccount, "Account deleted.");
+            }
+          }}
+        >
+          Delete account
+        </Button>
+      </div>
       {msg && <p className="mt-2 text-sm text-muted">{msg}</p>}
     </Card>
   );
@@ -302,6 +361,7 @@ export default function ProfilePage() {
         </Row>
       </Card>
 
+      <DangerZone />
       <DataCard />
 
       <p className="text-center text-sm text-muted">

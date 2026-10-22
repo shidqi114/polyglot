@@ -61,4 +61,7 @@ ui-debug.log
 
 # graphify: intermediate build files and incremental-extraction cache
 graphify-out/.graphify_*
+# curated community names, kept under version control
+!graphify-out/.graphify_labels.json
+!graphify-out/.graphify_labels.json.sig
 graphify-out/cache/

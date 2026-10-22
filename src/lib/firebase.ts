@@ -1,6 +1,7 @@
 "use client";
 
 import { getApp, getApps, initializeApp, type FirebaseApp } from "firebase/app";
+import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 import {
   browserLocalPersistence,
   getRedirectResult,
@@ -44,6 +45,12 @@ export function getFirebase(): { app: FirebaseApp; auth: Auth; db: Firestore } |
   if (!app) {
     const existing = getApps().length > 0;
     app = existing ? getApp() : initializeApp({ ...config, authDomain: config.authDomain || `${config.projectId}.firebaseapp.com` });
+    // App Check adds a token to every request, so copied config alone cannot read or write data.
+    // Active only when a reCAPTCHA v3 site key is configured (enforce it in the Firebase console).
+    const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+    if (recaptchaKey && process.env.NEXT_PUBLIC_FIREBASE_EMULATOR !== "1") {
+      initializeAppCheck(app, { provider: new ReCaptchaV3Provider(recaptchaKey), isTokenAutoRefreshEnabled: true });
+    }
     auth = initializeAuth(app, {
       persistence: [indexedDBLocalPersistence, browserLocalPersistence],
       popupRedirectResolver: browserPopupRedirectResolver,
