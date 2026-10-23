@@ -51,7 +51,7 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
 | `src/store/progress.ts` | Progress store: lessons, cards, day counters, settings, pending sync changes |
 | `firestore.rules`, `firebase.json` | Security rules (validated field by field) and emulator config |
 | `scripts/deploy-rules.mjs` | Deploys `firestore.rules` to the project in `FIREBASE_PROJECT_ID` once the rules tests pass and the rules are committed (`npm run deploy:rules`) |
-| `scripts/content/build-packs.ts` | Builds `public/packs/v1` (example sentences, pitch accent, verb forms, kanji strokes, idioms) from Kanjium, Tatoeba and KanjiVG |
+| `scripts/content/build-packs.ts`, `scripts/content/lib.ts` | Builds `public/packs/v2` (example sentences, pitch accent, verb forms, kanji strokes, idioms) from Kanjium, Tatoeba and KanjiVG. `lib.ts` holds the pure helpers, including the ruby (furigana) parser |
 | `src/content/packs.ts`, `src/components/offline-content.tsx` | Typed loader for the packs, and the Profile section that downloads levels for offline use |
 | `src/lib/mora.ts` | Morae and pitch patterns (used by the word pages) |
 | `src/components/word/` | Word page 2.0: pitch graph, verb forms, examples, kanji parts, stroke order, personal note |
@@ -79,7 +79,7 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
   Japanese text uses the `.jp` class. Layout must work at 390px wide (iPhone) and on desktop with no horizontal scroll.
 - Content licensing: vocabulary/kanji data is CC BY-SA 4.0 (EDRDG) via MIT-licensed converters. The knowledge packs add
   Kanjium (CC BY-SA 4.0, with its required attribution sentence on the Credits page), Tatoeba sentences (CC BY 2.0 FR) and
-  KanjiVG (CC BY-SA 3.0); see `public/packs/v1/manifest.json`. Do **not** copy code
+  KanjiVG (CC BY-SA 3.0); see `public/packs/v2/manifest.json`. Do **not** copy code
   from the AGPL/GPL reference repos (kana-dojo, read-frog, LLPlayer).
 - Inspiration only: `5mdld/anki-jlpt-decks` (CC BY-NC, Chinese glosses) informed the vocabulary note structure
   (word, reading, pitch accent, part of speech, example sentence). Its data and audio are **not** used. The vocabulary
@@ -109,13 +109,13 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
 
 ## Knowledge packs
 
-- `npm run packs` writes `public/packs/v1/<level>/{words,kanji,strokes}.json` and `extras.json`. Word records use the
+- `npm run packs` writes `public/packs/v2/<level>/{words,kanji,strokes}.json` and `extras.json`. Word records use the
   ids of the bundled course data (`v:<word>:<reading>`), so progress and packs stay in step. Changing the course ids
   means rebuilding the packs too.
 - Examples: a sentence must contain the word as a whole word (not inside a longer word). The word itself always gets its
-  dictionary reading. Furigana comes from Kanjium where it exists, otherwise from kuromoji. kuromoji can misread other
+  dictionary reading. Furigana comes from Kanjium's `furigana` column where it exists (the `japanese` column has no ruby), otherwise from kuromoji. kuromoji can misread other
   words in context (for example 書い read as かい), which is a known limitation.
-- The packs are cached on demand by the service worker (`knowledge-packs-v1`). Profile → Offline study content downloads
+- The packs are cached on demand by the service worker (`PACK_CACHE` in `src/content/packs.ts`, currently `knowledge-packs-v2`; the service worker deletes older pack caches). Profile → Offline study content downloads
   them ahead of time and asks the browser to keep them.
 - `tests/unit/packs.test.ts` checks ids, pitch ranges, markup-free text and stroke paths.
 
@@ -177,7 +177,7 @@ npm run test:rules     # Firestore rules on the emulator (needs Java)
 npm run test:sync      # sign-in + cross-device sync against Firebase emulators (needs Java)
 npm run content        # regenerate src/content/generated from upstream datasets
 npm run icons          # regenerate PNG icons from public/icons/icon.svg
-npm run packs          # rebuild the offline knowledge packs in public/packs/v1 (needs network; cached in .cache/)
+npm run packs          # rebuild the offline knowledge packs in public/packs/v2 (sources cached in .cache/; fetches them when missing)
 npm run check:secrets  # fail if any tracked file holds a credential (the pre-commit hook checks staged changes)
 npm run deploy:rules   # deploy firestore.rules to FIREBASE_PROJECT_ID after the rules tests pass (add -- --check to run the gates only)
 ```
@@ -241,6 +241,21 @@ Format:
 - Verification: checks run and results
 - Notes: follow-ups, migrations, or manual steps (e.g. deploy rules, new env vars)
 ```
+
+### 2026-10-23 — Knowledge packs v2 with Kanjium furigana (topic mode, phase 1)
+- Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
+- Changes:
+  - Example sentences now use Kanjium's furigana. The pack build read the plain `japanese` column, which has no ruby,
+    and its ruby pattern lacked a `</rp>`, so every sentence fell back to kuromoji (which misreads words such as 書い).
+  - The packs are written to `public/packs/v2`, and `PACK_VERSION` is `v2`. The service worker caches them under
+    `PACK_CACHE` and deletes older pack caches on activate. `public/packs/v1` is removed.
+  - Pure pack helpers moved into `scripts/content/lib.ts`. The parser tolerates Kanjium's malformed closing tags.
+- Files: `scripts/content/lib.ts` (new), `scripts/content/build-packs.ts`, `src/content/packs.ts`, `src/app/sw.ts`,
+  `tests/unit/pack-lib.test.ts` (new), `tests/unit/packs.test.ts`, `tests/e2e/app.spec.ts`, `public/packs/v2/**`, `CLAUDE.md`
+- Verification: `npm run packs` rebuilt from the cached sources (119,578 sentences, 13,253 annotated; 7 annotated
+  ruby texts differ from the plain sentence and are kept as plain text); lint, typecheck and build pass; unit tests
+  138 of 138; browser tests 20 of 20.
+- Notes: the packs rebuild on the next `npm run packs`. Existing installs fetch v2 on next use and drop the v1 cache.
 
 ### 2026-10-22 — Automatic Firestore rules deploy
 - Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
@@ -349,7 +364,7 @@ Format:
   - The service worker caches `/packs/` on demand and precaches only icons, which keeps the install small.
 - Files: `scripts/content/build-packs.ts`, `src/content/packs.ts`, `src/components/offline-content.tsx`, `src/lib/mora.ts`,
   `src/app/sw.ts`, `next.config.ts`, `src/app/(tabs)/profile/page.tsx`, `src/app/(tabs)/credits/page.tsx`,
-  `public/packs/v1/**`, `tests/unit/packs.test.ts`, `tests/unit/mora.test.ts`, `tests/e2e/app.spec.ts`, `package.json`
+  `public/packs/v2/**`, `tests/unit/packs.test.ts`, `tests/unit/mora.test.ts`, `tests/e2e/app.spec.ts`, `package.json`
 - Verification: pipeline run from the sources; pack tests (ids, pitch ranges, no markup, stroke paths) pass; 68 unit tests;
   build; browser tests 10/10 including the packs served with security headers and the offline section on Profile.
 - Notes: the sentence matching now needs whole words, so coverage is lower than the first estimate. Kanji stroke data

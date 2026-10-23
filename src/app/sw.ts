@@ -2,6 +2,7 @@
 import { defaultCache } from "@serwist/next/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 import { CacheFirst, NetworkOnly, Serwist } from "serwist";
+import { PACK_CACHE } from "@/content/packs";
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -24,7 +25,7 @@ const serwist = new Serwist({
     { matcher: ({ url }) => url.pathname.startsWith("/__/"), handler: new NetworkOnly() },
     { matcher: ({ url }) => PRIVATE_HOSTS.test(url.hostname), handler: new NetworkOnly() },
     // Knowledge packs are versioned by path, so a cached copy never goes stale; they stay until the user clears them.
-    { matcher: ({ url }) => url.pathname.startsWith("/packs/"), handler: new CacheFirst({ cacheName: "knowledge-packs-v1" }) },
+    { matcher: ({ url }) => url.pathname.startsWith("/packs/"), handler: new CacheFirst({ cacheName: PACK_CACHE }) },
     ...defaultCache,
   ],
   fallbacks: {
@@ -32,9 +33,17 @@ const serwist = new Serwist({
   },
 });
 
-// Earlier versions cached cross-origin responses, which can include sign-in traffic. Drop that cache.
+// Earlier versions cached cross-origin responses, which can include sign-in traffic, and used older pack versions.
+// Drop those caches; the current pack cache is kept.
 self.addEventListener("activate", (event) => {
-  event.waitUntil(caches.delete("cross-origin"));
+  event.waitUntil(
+    (async () => {
+      await caches.delete("cross-origin");
+      for (const name of await caches.keys()) {
+        if (name.startsWith("knowledge-packs-") && name !== PACK_CACHE) await caches.delete(name);
+      }
+    })(),
+  );
 });
 
 serwist.addEventListeners();

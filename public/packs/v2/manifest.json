@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-22T16:21:35.792Z",
+  "generatedAt": "2026-10-23T16:34:21.009Z",
   "levels": {
     "n5": {
       "words": 718,
@@ -69,5 +69,5 @@
       "url": "https://github.com/takuyaa/kuromoji.js"
     }
   ],
-  "bytes": 6698491
+  "bytes": 6675096
 }

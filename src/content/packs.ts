@@ -1,8 +1,8 @@
-// Loads the offline knowledge packs written by scripts/content/build-packs.ts (public/packs/v1).
+// Loads the offline knowledge packs written by scripts/content/build-packs.ts (public/packs/v2).
 // Files are cached by the service worker, so a downloaded level keeps working offline.
 import type { Level } from "@/lib/types";
 
-export const PACK_VERSION = "v1";
+export const PACK_VERSION = "v2";
 export const PACK_CACHE = `knowledge-packs-${PACK_VERSION}`;
 
 export type Segment = string | [string, string];

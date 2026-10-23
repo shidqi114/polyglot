@@ -5,7 +5,7 @@ import { morae } from "@/lib/mora";
 import type { Level } from "@/lib/types";
 
 // Integrity checks on the generated knowledge packs (npm run packs). They read the files on disk.
-const ROOT = path.join(process.cwd(), "public/packs/v1");
+const ROOT = path.join(process.cwd(), "public/packs/v2");
 const LEVELS: Level[] = ["n5", "n4", "n3", "n2", "n1"];
 const read = <T>(file: string): T => JSON.parse(readFileSync(path.join(ROOT, file), "utf8")) as T;
 

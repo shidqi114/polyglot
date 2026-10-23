@@ -16,7 +16,7 @@ async function expectNoHorizontalScroll(page: Page) {
 }
 
 test("knowledge packs are served with the security headers", async ({ request }) => {
-  const res = await request.get("/packs/v1/n5/words.json");
+  const res = await request.get("/packs/v2/n5/words.json");
   expect(res.ok()).toBe(true);
   expect(res.headers()["content-security-policy"]).toBeTruthy();
   expect((await res.json()).length).toBeGreaterThan(500);
