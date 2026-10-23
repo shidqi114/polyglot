@@ -1,17 +1,17 @@
 # Graph Report - polyglot  (2026-10-23)
 
 ## Corpus Check
-- 134 files · ~228,512 words
+- 139 files · ~232,838 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 5 file(s) not represented in the graph (top: (none) 2, .example 1, .rules 1)
 
 ## Summary
-- 802 nodes · 1935 edges · 34 communities (30 shown, 4 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 44 edges (avg confidence: 0.85)
+- 825 nodes · 1987 edges · 32 communities (28 shown, 4 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 45 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1af5ccc4`
+- Built from commit: `e694e453`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -32,8 +32,8 @@
 - End-to-end tests
 - Answer checking
 - Lint configuration
-- vitest
-- Rules tests
+- Button
+- build-content.ts
 - Backup validation
 - PostCSS configuration
 - UI conventions
@@ -43,12 +43,10 @@
 - lesson-engine.ts
 - build-packs.ts
 - packs.ts
-- practice-sets.ts
+- today-card.tsx
 - ProgressActions
 - srs.ts
-- kana.ts
-- dayKey
-- explain.ts
+- providers.tsx
 
 ## God Nodes (most connected - your core abstractions)
 1. `useProgress` - 47 edges
@@ -57,7 +55,7 @@
 4. `Button()` - 29 edges
 5. `LessonPlayer()` - 25 edges
 6. `react` - 24 edges
-7. `vitest` - 21 edges
+7. `vitest` - 22 edges
 8. `AudioButton()` - 20 edges
 9. `dayKey()` - 20 edges
 10. `lucide-react` - 18 edges
@@ -77,39 +75,39 @@
 ## Import Cycles
 - None detected.
 
-## Communities (34 total, 4 thin omitted)
+## Communities (32 total, 4 thin omitted)
 
 ### Community 0 - "types.ts"
 Cohesion: 0.08
-Nodes (38): vitest, HomePage(), LearningPath(), lessonDescription(), LessonIcon(), LessonNode(), OFFSETS, UNIT_COLORS (+30 more)
+Nodes (36): vitest, LEVELS, lessonDescription(), LessonIcon(), LessonNode(), OFFSETS, UNIT_COLORS, UnitBlock() (+28 more)
 
 ### Community 1 - "achievements.ts"
-Cohesion: 0.10
-Nodes (11): Achievement, EvaluatedAchievement, HIRAGANA, KANA_ROW_ITEMS, KATAKANA, LESSONS_N5, N4_GRAMMAR, N5_GRAMMAR (+3 more)
+Cohesion: 0.08
+Nodes (16): KANA_ROWS, Achievement, ACHIEVEMENTS, evaluate(), EvaluatedAchievement, HIRAGANA, KANA_ROW_ITEMS, KATAKANA (+8 more)
 
 ### Community 2 - "sync.ts"
-Cohesion: 0.10
-Nodes (41): metadata, RootLayout(), viewport, AccountCard(), DangerZone(), DataCard(), ProfilePage(), Row() (+33 more)
+Cohesion: 0.08
+Nodes (55): firebase, CreditsPage(), INSPIRATION, SOURCES, TabsLayout(), AccountCard(), DangerZone(), DataCard() (+47 more)
 
 ### Community 3 - "Project documentation"
 Cohesion: 0.07
 Nodes (46): Project changelog, npm command set, Content licensing constraints, Content generation pipeline, Course structure (sections, units, lessons), Derived XP and streaks, Environment variables and secrets policy, Firebase Auth and Firestore (+38 more)
 
 ### Community 4 - "Lesson exercises and dictionary UI"
-Cohesion: 0.08
-Nodes (74): lucide-react, react, wanakana, CreditsPage(), INSPIRATION, SOURCES, Detail(), DictionaryPage() (+66 more)
+Cohesion: 0.07
+Nodes (64): clsx, lucide-react, react, wanakana, Detail(), DictionaryPage(), DictionaryTabs(), search() (+56 more)
 
 ### Community 5 - "n1"
 Cohesion: 0.05
 Nodes (43): bytes, extras, idioms, proverbs, generatedAt, levels, n1, n2 (+35 more)
 
 ### Community 6 - "next.config.ts"
-Cohesion: 0.22
-Nodes (5): nextConfig, securityHeaders, withSerwist, next, @serwist/next
+Cohesion: 0.33
+Nodes (4): nextConfig, securityHeaders, withSerwist, @serwist/next
 
 ### Community 7 - "build-content.ts"
 Cohesion: 0.06
-Nodes (32): fetchText(), KanjiEntry, Level, LEVELS, main(), OUT_DIR, parseCsv(), RawKanji (+24 more)
+Nodes (22): @firebase/rules-unit-testing, jobs, maskable, square, problems, checkOnly, commit, fail() (+14 more)
 
 ### Community 8 - "TypeScript configuration"
 Cohesion: 0.10
@@ -117,7 +115,7 @@ Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModu
 
 ### Community 9 - "Package manifest"
 Cohesion: 0.10
-Nodes (20): engines, node, name, private, version, clsx, eslint, eslint-config-next (+12 more)
+Nodes (19): engines, node, name, private, version, eslint, eslint-config-next, firebase-tools (+11 more)
 
 ### Community 10 - "Dev dependencies"
 Cohesion: 0.11
@@ -129,11 +127,11 @@ Nodes (13): dependencies, clsx, firebase, framer-motion, lucide-react, next, rea
 
 ### Community 12 - "npm scripts"
 Cohesion: 0.12
-Nodes (16): scripts, build, check:secrets, content, deploy:rules, dev, icons, lint (+8 more)
+Nodes (17): scripts, build, check:secrets, content, deploy:rules, dev, icons, lint (+9 more)
 
 ### Community 13 - "End-to-end tests"
-Cohesion: 0.20
-Nodes (7): PORT, @playwright/test, ALL_KANA, test, kanaOf, playKanaLesson(), romajiOf
+Cohesion: 0.22
+Nodes (6): PORT, @playwright/test, test, kanaOf, playKanaLesson(), romajiOf
 
 ### Community 14 - "Answer checking"
 Cohesion: 0.49
@@ -143,33 +141,33 @@ Nodes (8): checkEnglish(), checkInput(), checkKana(), checkRomaji(), editDistanc
 Cohesion: 0.25
 Nodes (5): compat, __dirname, eslintConfig, __filename, @eslint/eslintrc
 
-### Community 16 - "vitest"
-Cohesion: 0.10
-Nodes (18): kuromoji, LEVELS, StoryList(), StoryPage(), StoryRoute(), StoryView(), STORIES, Story (+10 more)
+### Community 16 - "Button"
+Cohesion: 0.06
+Nodes (43): kuromoji, next, LEVELS, loadTokenizer(), main(), ROOT, WORD_TYPE_OVERRIDES, buildWordTypes() (+35 more)
 
-### Community 17 - "Rules tests"
+### Community 17 - "build-content.ts"
 Cohesion: 0.22
-Nodes (3): firebase, @firebase/rules-unit-testing, settings
+Nodes (12): fetchText(), KanjiEntry, Level, LEVELS, main(), OUT_DIR, parseCsv(), RawKanji (+4 more)
 
 ### Community 18 - "Backup validation"
 Cohesion: 0.15
 Nodes (15): zod, Backup, BackupError, backupSchema, cardSchema, daySchema, findForbiddenKey(), FORBIDDEN_KEYS (+7 more)
 
 ### Community 22 - "weekly.ts"
-Cohesion: 0.19
-Nodes (19): Tile(), WeeklyPage(), activeTriggers(), tipFor(), accuracyByGroup(), cardAccuracy(), Cards, coachingState() (+11 more)
+Cohesion: 0.21
+Nodes (18): Tile(), WeeklyPage(), SrsCard, accuracyByGroup(), cardAccuracy(), Cards, coachingState(), confusions() (+10 more)
 
 ### Community 23 - "Dependency overrides"
 Cohesion: 0.67
 Nodes (3): overrides, @grpc/grpc-js, postcss
 
 ### Community 24 - "progress.ts"
-Cohesion: 0.18
-Nodes (11): SrsCard, bumpDay(), DayStats, DEFAULT_SETTINGS, emptyPending(), initialData(), Note, Pending (+3 more)
+Cohesion: 0.19
+Nodes (14): Activity(), bestStreak(), addDays(), computeStreak(), dayKey(), bumpDay(), DayStats, DEFAULT_SETTINGS (+6 more)
 
 ### Community 25 - "lesson-engine.ts"
-Cohesion: 0.10
-Nodes (46): Lesson(), LessonPage(), LessonRoute(), PracticeRun(), PracticeRunPage(), CompleteScreen(), Stat(), PlayerResult (+38 more)
+Cohesion: 0.06
+Nodes (77): Lesson(), LessonPage(), LessonRoute(), PracticeRun(), PracticeRunPage(), formatIn(), ReviewPage(), start() (+69 more)
 
 ### Community 26 - "build-packs.ts"
 Cohesion: 0.14
@@ -177,27 +175,19 @@ Nodes (24): buildTokenizer(), CACHE, fetchCached(), KanjiEntry, Level, LEVEL_NUM
 
 ### Community 27 - "packs.ts"
 Cohesion: 0.12
-Nodes (28): serwist, serwist, WorkerGlobalScope, cachedAll(), LEVELS, mb(), OfflineContent(), base() (+20 more)
+Nodes (27): serwist, serwist, WorkerGlobalScope, cachedAll(), LEVELS, mb(), OfflineContent(), base() (+19 more)
 
-### Community 28 - "practice-sets.ts"
-Cohesion: 0.07
-Nodes (39): formatIn(), ReviewPage(), start(), Pick(), TodayCard(), CULTURE, CultureNote, cache (+31 more)
+### Community 28 - "today-card.tsx"
+Cohesion: 0.19
+Nodes (12): Pick(), CULTURE, CultureNote, Tip, TIPS, TipTrigger, activeTriggers(), CoachingState (+4 more)
 
 ### Community 30 - "srs.ts"
-Cohesion: 0.27
-Nodes (9): ts-fsrs, fromCard(), GRADES, Grading, isDue(), retrievability(), reviewCard(), scheduler (+1 more)
+Cohesion: 0.25
+Nodes (10): ts-fsrs, fromCard(), GRADES, Grading, isDue(), retrievability(), reviewCard(), scheduler (+2 more)
 
-### Community 31 - "kana.ts"
-Cohesion: 0.19
-Nodes (9): HIRAGANA_ROWS, hiraganaToKatakana(), KANA_BY_ID, KANA_ROWS, kanaItem(), ACHIEVEMENTS, evaluate(), Progress (+1 more)
-
-### Community 32 - "dayKey"
-Cohesion: 0.50
-Nodes (6): Activity(), bestStreak(), addDays(), computeStreak(), dayKey(), mem
-
-### Community 33 - "explain.ts"
-Cohesion: 0.36
-Nodes (7): confusablePairs(), explainChoice(), explainKana(), isParticle(), KANA_PAIRS, PARTICLE_HINTS, toHiragana()
+### Community 31 - "providers.tsx"
+Cohesion: 0.33
+Nodes (6): metadata, RootLayout(), viewport, Providers(), THEME_SCRIPT, ThemeSync()
 
 ## Ambiguous Edges - Review These
 - `Content licensing constraints` → `Inspiration projects`  [AMBIGUOUS]
@@ -209,22 +199,22 @@ Nodes (7): confusablePairs(), explainChoice(), explainKana(), isParticle(), KANA
 
 ## Knowledge Gaps
 - **25 isolated node(s):** `framer-motion`, `react-dom`, `@tailwindcss/postcss`, `@types/kuromoji`, `@types/node` (+20 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 312 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 319 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `vitest` connect `types.ts` to `dayKey`, `explain.ts`, `build-content.ts`, `Package manifest`, `Answer checking`, `vitest`, `Rules tests`, `Backup validation`, `weekly.ts`, `lesson-engine.ts`, `build-packs.ts`, `practice-sets.ts`, `kana.ts`?**
-  _High betweenness centrality (0.116) - this node is a cross-community bridge._
+- **Why does `vitest` connect `types.ts` to `achievements.ts`, `Lesson exercises and dictionary UI`, `build-content.ts`, `Package manifest`, `Answer checking`, `Button`, `Backup validation`, `weekly.ts`, `progress.ts`, `lesson-engine.ts`, `build-packs.ts`, `today-card.tsx`?**
+  _High betweenness centrality (0.134) - this node is a cross-community bridge._
 - **What connects `framer-motion`, `react-dom`, `@tailwindcss/postcss` to the rest of the system?**
   _25 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `types.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.07616892911010557 - nodes in this community are weakly interconnected._
-- **Why does `react` connect `Lesson exercises and dictionary UI` to `types.ts`, `sync.ts`, `Package manifest`, `vitest`, `weekly.ts`, `lesson-engine.ts`, `packs.ts`, `practice-sets.ts`?**
-  _High betweenness centrality (0.052) - this node is a cross-community bridge._
+  _Cohesion score 0.08 - nodes in this community are weakly interconnected._
+- **Why does `react` connect `Lesson exercises and dictionary UI` to `types.ts`, `sync.ts`, `Package manifest`, `Button`, `weekly.ts`, `lesson-engine.ts`, `packs.ts`, `today-card.tsx`, `providers.tsx`?**
+  _High betweenness centrality (0.051) - this node is a cross-community bridge._
 - **Should `achievements.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.09523809523809523 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08045977011494253 - nodes in this community are weakly interconnected._
 
 ### Low-confidence Hints
 _AMBIGUOUS edges — the extractor was unsure. Verify before acting on these._

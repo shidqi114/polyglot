@@ -24,9 +24,9 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1792711689.2424726,
-    "seen": 1792711811.4216235,
-    "ast_hash": "10f7b488a0ef36b37babd2b7dc32854f",
+    "mtime": 1792799724.9504218,
+    "seen": 1792799926.1857374,
+    "ast_hash": "1f31e1ae1a954d6f591045beb6eabb28",
     "semantic_hash": ""
   },
   "playwright.config.ts": {
@@ -414,9 +414,9 @@
     "semantic_hash": "d69ffbb9f2f3e79a3a1fd885fc688736"
   },
   "CLAUDE.md": {
-    "mtime": 1792773410.520536,
-    "seen": 1792773418.1388078,
-    "ast_hash": "df20eeeebe0ef92897f99037279f8a56",
+    "mtime": 1792799871.072331,
+    "seen": 1792799926.1898699,
+    "ast_hash": "f63e68d23f0ed658ad7f1464fc5d66c4",
     "semantic_hash": ""
   },
   "README.md": {
@@ -492,9 +492,9 @@
     "semantic_hash": ""
   },
   "scripts/content/build-packs.ts": {
-    "mtime": 1792773197.3811502,
-    "seen": 1792773418.1364768,
-    "ast_hash": "b40c681c80ce40fea752c9cb67d97aa8",
+    "mtime": 1792799868.0448985,
+    "seen": 1792799926.1863625,
+    "ast_hash": "cb1ea5714428b46531f2d1cead160e91",
     "semantic_hash": ""
   },
   "src/components/offline-content.tsx": {
@@ -801,6 +801,36 @@
     "mtime": 1792773258.6410375,
     "seen": 1792773418.1385884,
     "ast_hash": "ad0fd832c858d2437b5dcf1f6e2ad82f",
+    "semantic_hash": ""
+  },
+  "scripts/content/build-topics.ts": {
+    "mtime": 1792799724.9140415,
+    "seen": 1792799926.1863678,
+    "ast_hash": "8846772a6e2b2817cdedde3d3c0cdca0",
+    "semantic_hash": ""
+  },
+  "scripts/content/word-type-overrides.ts": {
+    "mtime": 1792799825.5707064,
+    "seen": 1792799926.1865742,
+    "ast_hash": "d38deea7ac8318bc0157993e8830137f",
+    "semantic_hash": ""
+  },
+  "scripts/content/word-types.ts": {
+    "mtime": 1792799825.5710719,
+    "seen": 1792799926.186577,
+    "ast_hash": "459a0747128ac88f6b7cf35387653e3c",
+    "semantic_hash": ""
+  },
+  "src/content/generated/word-types.json": {
+    "mtime": 1792799826.705926,
+    "seen": 1792799926.1883445,
+    "ast_hash": "176db6b8bc854d58c4f45cd6a663d4ce",
+    "semantic_hash": ""
+  },
+  "tests/unit/word-types.test.ts": {
+    "mtime": 1792799802.128849,
+    "seen": 1792799926.1897285,
+    "ast_hash": "dbcb35314e7ccd8bf4e2e1ed69305ab2",
     "semantic_hash": ""
   }
 }

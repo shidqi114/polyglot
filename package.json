@@ -17,7 +17,8 @@
     "check:secrets": "node scripts/check-secrets.mjs --all",
     "deploy:rules": "node scripts/deploy-rules.mjs",
     "prepare": "node scripts/install-hooks.mjs",
-    "packs": "tsx scripts/content/build-packs.ts"
+    "packs": "tsx scripts/content/build-packs.ts",
+    "topics": "tsx scripts/content/build-topics.ts"
   },
   "dependencies": {
     "@serwist/next": "^9.5.13",

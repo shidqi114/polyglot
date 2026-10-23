@@ -39,7 +39,7 @@ async function fetchCached(url: string, file: string): Promise<Buffer> {
   return buf;
 }
 
-import { KANJI, katakanaToHiragana, kuromojiSegments, plainOf, rubyToSegments, standaloneIndex, stripTags, withTargetReading, type Segment } from "./lib";
+import { KANJI, kuromojiSegments, plainOf, rubyToSegments, standaloneIndex, stripTags, withTargetReading, type Segment } from "./lib";
 function buildTokenizer(): Promise<{ tokenize(text: string): { surface_form: string; reading?: string }[] }> {
   const dicPath = path.join(path.dirname(require.resolve("kuromoji/package.json")), "dict");
   return new Promise((resolve, reject) =>

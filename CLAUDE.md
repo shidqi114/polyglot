@@ -42,6 +42,7 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
 | `src/lib/achievements.ts`, `src/components/achievements.tsx` | 38 achievements derived from progress; Profile shows them and a toast announces new ones |
 | `src/components/today-card.tsx`, `src/content/culture.ts` | Today card at the top of the path, and the culture notes it shows (one per day) |
 | `src/content/course.ts` | Builds sections → units → lessons (6 words / 4 kanji per lesson) |
+| `scripts/content/word-types.ts`, `scripts/content/word-type-overrides.ts`, `scripts/content/build-topics.ts` | Word types (noun, verb, い/な-adjective, adverb, pronoun, number, counter, set phrase, pattern) for the N5/N4 vocabulary, from kuromoji's tags. Reviewed overrides, each with a reason. `npm run topics` writes `src/content/generated/word-types.json` |
 | `src/content/generated/*.json` | Generated JLPT vocab/kanji (do not edit by hand; run `npm run content`) |
 | `src/content/loader.ts` | Lazy loading of level data, lesson items and distractor pools |
 | `src/lib/lesson-engine.ts` | Exercise generation for lessons, reviews and practice |
@@ -179,6 +180,7 @@ npm run content        # regenerate src/content/generated from upstream datasets
 npm run icons          # regenerate PNG icons from public/icons/icon.svg
 npm run packs          # rebuild the offline knowledge packs in public/packs/v2 (sources cached in .cache/; fetches them when missing)
 npm run check:secrets  # fail if any tracked file holds a credential (the pre-commit hook checks staged changes)
+npm run topics        # regenerate src/content/generated/word-types.json (N5/N4, no network)
 npm run deploy:rules   # deploy firestore.rules to FIREBASE_PROJECT_ID after the rules tests pass (add -- --check to run the gates only)
 ```
 
@@ -241,6 +243,24 @@ Format:
 - Verification: checks run and results
 - Notes: follow-ups, migrations, or manual steps (e.g. deploy rules, new env vars)
 ```
+
+### 2026-10-23 — Word types for N5 and N4 (topic mode, phase 2)
+- Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
+- Changes:
+  - Every N5 and N4 word gets a type: noun, verb, い-adjective, な-adjective, adverb, pronoun (including question and
+    pointing words), number, counter, set phrase, or pattern (grammar patterns and suffixes such as ～続ける, which get
+    no practice card). The types come from kuromoji's tags, with ten reviewed overrides, each with its reason.
+  - `npm run topics` writes `src/content/generated/word-types.json` (1,386 words). It needs no network and is the same
+    on every run.
+  - N3 to N1 word types come with the topic work later, so the file stays small.
+- Files: `scripts/content/word-types.ts`, `scripts/content/word-type-overrides.ts`, `scripts/content/build-topics.ts`
+  (all new), `src/content/generated/word-types.json` (new), `tests/unit/word-types.test.ts` (new), `package.json`,
+  `scripts/content/build-packs.ts` (unused import removed), `CLAUDE.md`
+- Verification: lint and typecheck pass; unit tests 142 of 142 pass, including golden words, every word typed, the
+  committed file matching a fresh run, and every override still changing the automatic answer.
+- Notes: the tagging fixed several misses along the way, such as compound nouns that ended in a suffix (郵便局, 誕生日)
+  and counters that must follow a numeral. Gloss-based hints are only a review aid, so the remaining "to …" glosses on
+  adjectives (欲しい, 嬉しい) stay adjectives.
 
 ### 2026-10-23 — Knowledge packs v2 with Kanjium furigana (topic mode, phase 1)
 - Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
