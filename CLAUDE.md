@@ -44,6 +44,8 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
 | `src/content/course.ts` | Builds sections → units → lessons (6 words / 4 kanji per lesson) |
 | `scripts/content/word-types.ts`, `scripts/content/word-type-overrides.ts`, `scripts/content/build-topics.ts` | Word types (noun, verb, い/な-adjective, adverb, pronoun, number, counter, set phrase, pattern) for the N5/N4 vocabulary, from kuromoji's tags. Reviewed overrides, each with a reason. `npm run topics` writes `src/content/generated/word-types.json` |
 | `src/content/topics.ts`, `src/content/topic-words.ts` | Topics for Practice → Study by topic: 22 topics in four groups, each with its key phrases (kana, tiles, English), linked grammar points and stories. `topic-words.ts` places every N5/N4 noun, verb, adjective and adverb in one topic or in everyday basics (≤15%). Tests: `tests/unit/topics.test.ts` |
+| `src/content/particles.ts`, `scripts/content/sentences.ts`, `scripts/content/sentence-exclusions.ts` | Particle drills: the particle list and families, and the "also correct" rules (hand table plus particles the corpus uses with the same verb). The pack build keeps short sentences of N5/N4 words with one particle blanked, and `sentence-exclusions.ts` lists reviewed sentences to leave out |
+| `src/lib/topic-exercises.ts` | Topic questions: particle questions (English as the hint, furigana around the blank) and phrase quizzes (hear it and pick the meaning, build it from tiles). Pure: the random source is passed in |
 | `src/content/generated/*.json` | Generated JLPT vocab/kanji (do not edit by hand; run `npm run content`) |
 | `src/content/loader.ts` | Lazy loading of level data, lesson items and distractor pools |
 | `src/lib/lesson-engine.ts` | Exercise generation for lessons, reviews and practice |
@@ -119,6 +121,10 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
   words in context (for example 書い read as かい), which is a known limitation.
 - The packs are cached on demand by the service worker (`PACK_CACHE` in `src/content/packs.ts`, currently `knowledge-packs-v2`; the service worker deletes older pack caches). Profile → Offline study content downloads
   them ahead of time and asks the browser to keep them.
+- `npm run packs` also writes `n5/sentences.json` and `n4/sentences.json`, the particle sentences for the drills. A sentence is 30
+  characters or fewer, every content word is N5 or N4 vocabulary, and one particle is blanked (the first one). Its English
+  must contain a meaning of each word it links (`w`). `also` lists the particles that also fit, and the drills never offer
+  them. Sentences in `sentence-exclusions.ts` are left out. At most 300 per particle per level.
 - `tests/unit/packs.test.ts` checks ids, pitch ranges, markup-free text and stroke paths.
 
 ## Study features (phase 3)
@@ -261,6 +267,35 @@ Format:
   reason, and a stale exception fails the test.
 - Notes: the word lists are hand-placed. Each topic lists its words in course order (N5 first). Stories and grammar
   points are linked from the topics, not tagged on the stories themselves.
+
+### 2026-10-24 — Particle drills and phrase quizzes (topic mode, phase 4)
+- Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
+- Changes:
+  - Particle sentences in the packs: `n5/sentences.json` (2,003 sentences) and `n4/sentences.json` (2,242). Each sentence
+    is 30 characters or fewer, uses only N5 or N4 vocabulary, and has one particle blanked. The English under the blank
+    says what the particle means. They come from Kanjium (annotated sentences first) and Tatoeba.
+  - "Also correct": a blank never offers a particle that also fits the sentence. The rules are a hand table (は, が and も;
+    に and へ; the が/は pair for 好き, 分かる, できる and similar verbs), plus the case particles that the corpus uses
+    with the same verb.
+  - Question builders for the topics: particle questions (with the English as the hint and furigana around the blank),
+    and phrase quizzes (hear it and pick the meaning, or build it from tiles). Offline, particle questions fall back to
+    the 168 hand-written grammar sentences.
+  - `scripts/content/sentence-exclusions.ts` lists reviewed sentences to leave out. It is empty for now.
+- Files: `src/content/particles.ts`, `scripts/content/sentences.ts`, `scripts/content/sentence-exclusions.ts`,
+  `src/lib/topic-exercises.ts` (all new), `public/packs/v2/n5/sentences.json` and `n4/sentences.json` (new),
+  `public/packs/v2/manifest.json`, `scripts/content/build-packs.ts`, `src/content/packs.ts`, `src/lib/types.ts`,
+  `tests/unit/sentences.test.ts`, `tests/unit/topic-exercises.test.ts` (new), `tests/unit/packs.test.ts`, `CLAUDE.md`
+- Verification: lint and typecheck pass; unit tests 189 of 189 pass. The pack tests check that each record's blank is the
+  particle it names, that no also-correct particle is the answer, that every linked word exists, and that the common
+  particles have enough sentences. The question tests check that each question has exactly one correct option, that no
+  wrong option is a particle that also fits, and that N5 items come before N4 items. `npm run packs` was run twice; the
+  second run came after fixing the also-correct rule (only case particles swap by verb) and the rule that rejects これまで
+  and 今から.
+- Notes: The plan wanted at least 60 sentences per particle and level. N5 has fewer for へ (22), まで (28), から (43) and も
+  (57). N4 has fewer for へ (52) and まで (40). The drills mix both levels, so the combined counts are 68 to 121 for those
+  particles. About 90 sampled sentences were checked by eye, and none needed excluding. The exclusion list stays empty
+  until the "Hide this sentence" feature (phase 5) shows real bad ones. Blanks that are part of a longer word are
+  rejected for これまで and 今から; other compounds are not checked.
 
 ### 2026-10-24 — Pronoun tags for これ, 私 and どこ (topic mode, phase 2 fix)
 - Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed

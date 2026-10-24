@@ -3,6 +3,9 @@ export const LEVELS: Level[] = ["n5", "n4", "n3", "n2", "n1"];
 
 export type ItemKind = "kana" | "vocab" | "kanji";
 
+/** Japanese with furigana: plain text, or [kanji, reading] for a word that has a reading written above it. */
+export type RubySegment = string | [string, string];
+
 /** A single learnable thing, normalised across kana, vocabulary and kanji. */
 export interface StudyItem {
   id: string;
@@ -80,6 +83,8 @@ export type Exercise =
       itemId?: string;
       question: string;
       prompt?: string;
+      /** The prompt with furigana, when the question is Japanese text with readings. */
+      promptRuby?: RubySegment[];
       promptSub?: string;
       /** Japanese text to speak; when audioOnly the prompt text is hidden. */
       audio?: string;

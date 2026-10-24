@@ -1,6 +1,7 @@
 // Loads the offline knowledge packs written by scripts/content/build-packs.ts (public/packs/v2).
 // Files are cached by the service worker, so a downloaded level keeps working offline.
 import type { Level } from "@/lib/types";
+import type { Particle } from "./particles";
 
 export const PACK_VERSION = "v2";
 export const PACK_CACHE = `knowledge-packs-${PACK_VERSION}`;
@@ -9,6 +10,17 @@ export type Segment = string | [string, string];
 export interface PackExample {
   ja: Segment[];
   en: string;
+}
+/** A sentence with one particle blanked (sentences.json, N5 and N4 only). `at` is the particle's offset in the plain text. */
+export interface PackSentence {
+  ja: Segment[];
+  at: number;
+  p: Particle;
+  en: string;
+  /** Particles that also fit the blank. Never offered as wrong choices. */
+  also: Particle[];
+  /** Vocabulary ids whose meaning appears in the English. Used to pick sentences for a topic. */
+  w: string[];
 }
 export type VerbForm = "dict" | "polite" | "neg" | "past" | "te" | "potential" | "passive" | "causative" | "volitional" | "conditional" | "imperative";
 export interface PackWord {
@@ -47,7 +59,12 @@ export interface PackManifest {
 const base = (...parts: string[]) => `/packs/${PACK_VERSION}/${parts.join("/")}`;
 
 /** URLs of the files that make up one level, for offline download. */
-export const levelFiles = (level: Level) => [base(level, "words.json"), base(level, "kanji.json"), base(level, "strokes.json")];
+export const levelFiles = (level: Level) => [
+  base(level, "words.json"),
+  base(level, "kanji.json"),
+  base(level, "strokes.json"),
+  ...(level === "n5" || level === "n4" ? [base(level, "sentences.json")] : []),
+];
 export const sharedFiles = () => [base("manifest.json"), base("extras.json")];
 
 const cache = new Map<string, Promise<unknown>>();
@@ -68,6 +85,8 @@ function getJson<T>(url: string): Promise<T> {
 export const loadManifest = () => getJson<PackManifest>(base("manifest.json"));
 export const loadExtras = () => getJson<PackExtra[]>(base("extras.json"));
 export const loadStrokes = (level: Level) => getJson<Record<string, string[]>>(base(level, "strokes.json"));
+/** Particle sentences for the drills; only N5 and N4 have them. */
+export const loadSentences = (level: Level) => getJson<PackSentence[]>(base(level, "sentences.json"));
 
 export async function loadWords(level: Level): Promise<Map<string, PackWord>> {
   const list = await getJson<PackWord[]>(base(level, "words.json"));

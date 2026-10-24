@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-23T16:34:21.009Z",
+  "generatedAt": "2026-10-24T00:18:22.494Z",
   "levels": {
     "n5": {
       "words": 718,
@@ -8,7 +8,8 @@
       "withPitch": 512,
       "withConjugation": 162,
       "kanji": 79,
-      "withStrokes": 79
+      "withStrokes": 79,
+      "sentences": 2003
     },
     "n4": {
       "words": 668,
@@ -16,7 +17,8 @@
       "withPitch": 489,
       "withConjugation": 158,
       "kanji": 166,
-      "withStrokes": 166
+      "withStrokes": 166,
+      "sentences": 2242
     },
     "n3": {
       "words": 2140,
@@ -24,7 +26,8 @@
       "withPitch": 1882,
       "withConjugation": 400,
       "kanji": 367,
-      "withStrokes": 367
+      "withStrokes": 367,
+      "sentences": 0
     },
     "n2": {
       "words": 1809,
@@ -32,7 +35,8 @@
       "withPitch": 1335,
       "withConjugation": 170,
       "kanji": 367,
-      "withStrokes": 367
+      "withStrokes": 367,
+      "sentences": 0
     },
     "n1": {
       "words": 2699,
@@ -40,7 +44,8 @@
       "withPitch": 2277,
       "withConjugation": 234,
       "kanji": 1232,
-      "withStrokes": 1232
+      "withStrokes": 1232,
+      "sentences": 0
     }
   },
   "extras": {
@@ -69,5 +74,5 @@
       "url": "https://github.com/takuyaa/kuromoji.js"
     }
   ],
-  "bytes": 6675096
+  "bytes": 7651525
 }

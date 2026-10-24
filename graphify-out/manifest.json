@@ -336,10 +336,10 @@
     "semantic_hash": "6b608ca15bf8f6b5bcf84edeb4bc962d"
   },
   "src/lib/types.ts": {
-    "mtime": 1792677270.1653802,
-    "seen": 1792683152.1284914,
-    "ast_hash": "218f742bd1902615af77d8cd948bf948",
-    "semantic_hash": "218f742bd1902615af77d8cd948bf948"
+    "mtime": 1792801039.1992939,
+    "seen": 1792801227.0134766,
+    "ast_hash": "37d9854441e66ca72ce6500760587ac2",
+    "semantic_hash": ""
   },
   "src/store/progress.ts": {
     "mtime": 1792686342.6312912,
@@ -414,9 +414,9 @@
     "semantic_hash": "d69ffbb9f2f3e79a3a1fd885fc688736"
   },
   "CLAUDE.md": {
-    "mtime": 1792800821.2377026,
-    "seen": 1792800822.5961416,
-    "ast_hash": "fc2c673fd1211653bd404efb573930f5",
+    "mtime": 1792801220.4762118,
+    "seen": 1792801227.014189,
+    "ast_hash": "b6f615500aa6cadb7c11498cc4899540",
     "semantic_hash": ""
   },
   "README.md": {
@@ -492,9 +492,9 @@
     "semantic_hash": ""
   },
   "scripts/content/build-packs.ts": {
-    "mtime": 1792799868.0448985,
-    "seen": 1792799926.1863625,
-    "ast_hash": "cb1ea5714428b46531f2d1cead160e91",
+    "mtime": 1792800996.773728,
+    "seen": 1792801227.011258,
+    "ast_hash": "eb1fbba0e672d658ec8ce69862e6dbba",
     "semantic_hash": ""
   },
   "src/components/offline-content.tsx": {
@@ -504,9 +504,9 @@
     "semantic_hash": ""
   },
   "src/content/packs.ts": {
-    "mtime": 1792773205.2625654,
-    "seen": 1792773418.1377654,
-    "ast_hash": "3f272d757868ab24d0353edf45ef31e4",
+    "mtime": 1792801183.3993876,
+    "seen": 1792801227.0129774,
+    "ast_hash": "173e37062e9ee131fff1781c394aa8f1",
     "semantic_hash": ""
   },
   "src/lib/mora.ts": {
@@ -522,9 +522,9 @@
     "semantic_hash": ""
   },
   "tests/unit/packs.test.ts": {
-    "mtime": 1792773205.2630448,
-    "seen": 1792773418.1385913,
-    "ast_hash": "b1b292bd0c85676a40c40768c515e8bd",
+    "mtime": 1792801172.7072933,
+    "seen": 1792801227.0139253,
+    "ast_hash": "a83a44a3a720aa4ad037e50133b3e282",
     "semantic_hash": ""
   },
   "src/components/word/pitch-graph.tsx": {
@@ -702,92 +702,92 @@
     "semantic_hash": ""
   },
   "public/packs/v2/extras.json": {
-    "mtime": 1792773279.0797396,
-    "seen": 1792773418.1363597,
+    "mtime": 1792801118.5980027,
+    "seen": 1792801227.0111399,
     "ast_hash": "2c71d1a17f660653848ded3f2f15b2e4",
     "semantic_hash": ""
   },
   "public/packs/v2/manifest.json": {
-    "mtime": 1792773279.0837395,
-    "seen": 1792773418.1363623,
-    "ast_hash": "194cb919df150522377cee54f8b38a51",
+    "mtime": 1792801118.6020029,
+    "seen": 1792801227.0111434,
+    "ast_hash": "1f9dc26461601f785476ea9a309c3018",
     "semantic_hash": ""
   },
   "public/packs/v2/n1/kanji.json": {
-    "mtime": 1792773279.0517397,
-    "seen": 1792773418.1363637,
+    "mtime": 1792801118.5700028,
+    "seen": 1792801227.0111463,
     "ast_hash": "dd2aaa5bc176f7a751736a3bd700e5aa",
     "semantic_hash": ""
   },
   "public/packs/v2/n1/strokes.json": {
-    "mtime": 1792773279.0597396,
-    "seen": 1792773418.1363657,
+    "mtime": 1792801118.5780027,
+    "seen": 1792801227.0111485,
     "ast_hash": "6e92447c9ab63127fb5afece8e5dff35",
     "semantic_hash": ""
   },
   "public/packs/v2/n2/kanji.json": {
-    "mtime": 1792773276.6957395,
-    "seen": 1792773418.1363676,
+    "mtime": 1792801115.9820025,
+    "seen": 1792801227.011151,
     "ast_hash": "32b7f1e1664afcdee8d398b28866f273",
     "semantic_hash": ""
   },
   "public/packs/v2/n2/strokes.json": {
-    "mtime": 1792773276.6997395,
-    "seen": 1792773418.1363688,
+    "mtime": 1792801115.9820025,
+    "seen": 1792801227.0111532,
     "ast_hash": "cef6f6cfd67b2e7e78bf9a5a86571106",
     "semantic_hash": ""
   },
   "public/packs/v2/n2/words.json": {
-    "mtime": 1792773276.6957395,
-    "seen": 1792773418.13637,
+    "mtime": 1792801115.9780025,
+    "seen": 1792801227.0111551,
     "ast_hash": "90e20e8205ccaea88be166db024036cc",
     "semantic_hash": ""
   },
   "public/packs/v2/n3/kanji.json": {
-    "mtime": 1792773275.4157393,
-    "seen": 1792773418.1363711,
+    "mtime": 1792801114.7220025,
+    "seen": 1792801227.0111573,
     "ast_hash": "bf3cfc57af31ece0274922d365a75bd0",
     "semantic_hash": ""
   },
   "public/packs/v2/n3/strokes.json": {
-    "mtime": 1792773275.4197395,
-    "seen": 1792773418.1363719,
+    "mtime": 1792801114.7260025,
+    "seen": 1792801227.0111597,
     "ast_hash": "c5a7ea6a6bd30bec0bf513e64eff105a",
     "semantic_hash": ""
   },
   "public/packs/v2/n4/kanji.json": {
-    "mtime": 1792773267.995739,
-    "seen": 1792773418.136373,
+    "mtime": 1792801107.346002,
+    "seen": 1792801227.0111618,
     "ast_hash": "e5bb4c0f71dbb5606c3b5c9d2e3ef0ca",
     "semantic_hash": ""
   },
   "public/packs/v2/n4/strokes.json": {
-    "mtime": 1792773267.995739,
-    "seen": 1792773418.136374,
+    "mtime": 1792801107.346002,
+    "seen": 1792801227.0111675,
     "ast_hash": "8741221c570af9b2adbdb4363984deab",
     "semantic_hash": ""
   },
   "public/packs/v2/n4/words.json": {
-    "mtime": 1792773267.995739,
-    "seen": 1792773418.1363747,
+    "mtime": 1792801107.3420022,
+    "seen": 1792801227.0111701,
     "ast_hash": "16a38c2bebbdf25d972b108264039cf0",
     "semantic_hash": ""
   },
   "public/packs/v2/n5/kanji.json": {
-    "mtime": 1792773265.6997387,
-    "seen": 1792773418.1363757,
+    "mtime": 1792801105.482002,
+    "seen": 1792801227.0111723,
     "ast_hash": "dd17b3f87fffc34093f7fcc5056fc829",
     "semantic_hash": ""
   },
   "public/packs/v2/n5/strokes.json": {
-    "mtime": 1792773265.6997387,
-    "seen": 1792773418.1363766,
+    "mtime": 1792801105.482002,
+    "seen": 1792801227.0111766,
     "ast_hash": "f02b9b265992cfdbf4bf5e10173e4cd1",
     "semantic_hash": ""
   },
   "public/packs/v2/n5/words.json": {
-    "mtime": 1792773265.6997387,
-    "seen": 1792773418.1363778,
+    "mtime": 1792801105.478002,
+    "seen": 1792801227.011179,
     "ast_hash": "2d2ffd8a4d5f4af7636266b71f9729d9",
     "semantic_hash": ""
   },
@@ -849,6 +849,54 @@
     "mtime": 1792800781.878138,
     "seen": 1792800808.1177478,
     "ast_hash": "b6fa943f4fc993fc6d49fd7d81822028",
+    "semantic_hash": ""
+  },
+  "public/packs/v2/n4/sentences.json": {
+    "mtime": 1792801107.354002,
+    "seen": 1792801227.011165,
+    "ast_hash": "9d1c021a4c7b5bb097d8cd0a984cfc3e",
+    "semantic_hash": ""
+  },
+  "public/packs/v2/n5/sentences.json": {
+    "mtime": 1792801105.490002,
+    "seen": 1792801227.0111742,
+    "ast_hash": "fa9019e034fb8ca873c692637c92a1a0",
+    "semantic_hash": ""
+  },
+  "scripts/content/sentence-exclusions.ts": {
+    "mtime": 1792800996.779471,
+    "seen": 1792801227.0113275,
+    "ast_hash": "2196371e6a4217446311aaf5fb9c960a",
+    "semantic_hash": ""
+  },
+  "scripts/content/sentences.ts": {
+    "mtime": 1792801080.8727267,
+    "seen": 1792801227.0113297,
+    "ast_hash": "845dbdf3d05c940e735ddc6240c7b83f",
+    "semantic_hash": ""
+  },
+  "src/content/particles.ts": {
+    "mtime": 1792801085.326951,
+    "seen": 1792801227.0129797,
+    "ast_hash": "8c26861107e5e0e4a150b14f6286f02f",
+    "semantic_hash": ""
+  },
+  "src/lib/topic-exercises.ts": {
+    "mtime": 1792801152.1435902,
+    "seen": 1792801227.013452,
+    "ast_hash": "ab903597cb06284ef0493f4254922a2b",
+    "semantic_hash": ""
+  },
+  "tests/unit/sentences.test.ts": {
+    "mtime": 1792801115.8671703,
+    "seen": 1792801227.0139704,
+    "ast_hash": "a07a594cd9895fac5de52597d0eeaa07",
+    "semantic_hash": ""
+  },
+  "tests/unit/topic-exercises.test.ts": {
+    "mtime": 1792801152.1440995,
+    "seen": 1792801227.0140183,
+    "ast_hash": "1f1f1d6e5a169312ea0599fefd57085a",
     "semantic_hash": ""
   }
 }

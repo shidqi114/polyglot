@@ -2,7 +2,9 @@ import { readFileSync, existsSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { morae } from "@/lib/mora";
+import { PARTICLES } from "@/content/particles";
 import type { Level } from "@/lib/types";
+import { EXCLUDED_SENTENCES } from "../../scripts/content/sentence-exclusions";
 
 // Integrity checks on the generated knowledge packs (npm run packs). They read the files on disk.
 const ROOT = path.join(process.cwd(), "public/packs/v2");
@@ -18,6 +20,39 @@ describe("knowledge packs", () => {
     expect(manifest.version).toBe(1);
     expect(Object.keys(manifest.levels).sort()).toEqual([...LEVELS].sort());
     expect(manifest.licenses.length).toBeGreaterThanOrEqual(4);
+  });
+
+  describe("particle sentences", () => {
+    const allIds = new Set([...vocabIds("n5").keys(), ...vocabIds("n4").keys()]);
+    const plainOf = (ja: unknown[]) => ja.map((seg) => (typeof seg === "string" ? seg : (seg as string[])[0])).join("");
+    for (const level of ["n5", "n4"] as const) {
+      const sentences = read<{ ja: unknown[]; at: number; p: string; en: string; also: string[]; w: string[] }[]>(`${level}/sentences.json`);
+
+      it(`${level}: blanks the particle the record names, and offers no particle that also fits`, () => {
+        expect(sentences.length).toBeGreaterThan(100);
+        for (const r of sentences) {
+          const plain = plainOf(r.ja);
+          expect(plain.slice(r.at, r.at + r.p.length), plain).toBe(r.p);
+          expect((PARTICLES as readonly string[]).includes(r.p), r.p).toBe(true);
+          expect(r.also, plain).not.toContain(r.p);
+          expect(plain).not.toMatch(/<|>/);
+        }
+      });
+
+      it(`${level}: links only known vocabulary whose meaning is in the English, and skips excluded sentences`, () => {
+        for (const r of sentences) {
+          for (const id of r.w) expect(allIds.has(id), id).toBe(true);
+          expect(EXCLUDED_SENTENCES.has(plainOf(r.ja))).toBe(false);
+        }
+      });
+
+      it(`${level}: keeps the particles spread across the family, with at least some of each`, () => {
+        const counts = new Map<string, number>();
+        for (const r of sentences) counts.set(r.p, (counts.get(r.p) ?? 0) + 1);
+        // が, は, の, を and に are the common particles; each level has plenty of them.
+        for (const p of ["が", "は", "の", "を", "に"]) expect(counts.get(p) ?? 0, p).toBeGreaterThan(50);
+      });
+    }
   });
 
   for (const level of LEVELS) {

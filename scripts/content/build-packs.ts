@@ -23,6 +23,7 @@ const OUT = path.join(ROOT, "public/packs/v2");
 const KANJIUM = "https://raw.githubusercontent.com/mifunetoshiro/kanjium/master/data/";
 const KANJIVG = "https://raw.githubusercontent.com/KanjiVG/kanjivg/master/kanji/";
 const EXAMPLES_PER_WORD = 3;
+const SENTENCES_PER_PARTICLE = 300;
 const MAX_SENTENCE_CHARS = 80;
 
 async function fetchCached(url: string, file: string): Promise<Buffer> {
@@ -40,7 +41,9 @@ async function fetchCached(url: string, file: string): Promise<Buffer> {
 }
 
 import { KANJI, kuromojiSegments, plainOf, rubyToSegments, standaloneIndex, stripTags, withTargetReading, type Segment } from "./lib";
-function buildTokenizer(): Promise<{ tokenize(text: string): { surface_form: string; reading?: string }[] }> {
+import { EXCLUDED_SENTENCES } from "./sentence-exclusions";
+import { analyse, blankIsPlain, MAX_PARTICLE_CHARS, sentenceRecord, verbPairCounts, vocabForms, type Analysis, type PackSentence, type Token } from "./sentences";
+function buildTokenizer(): Promise<{ tokenize(text: string): Token[] }> {
   const dicPath = path.join(path.dirname(require.resolve("kuromoji/package.json")), "dict");
   return new Promise((resolve, reject) =>
     kuromoji.builder({ dicPath }).build((err, tokenizer) => (err ? reject(err) : resolve(tokenizer))),
@@ -179,6 +182,47 @@ async function main() {
     return scored.slice(0, EXAMPLES_PER_WORD).map((x) => x.s);
   };
 
+  // 4b. Particle sentences for the drills (N5 and N4): short, every content word known, one particle blanked
+  const n5Ids = new Set(vocab.n5.map((v) => v.id));
+  const allVocab = [...vocab.n5, ...vocab.n4];
+  const forms = vocabForms(allVocab);
+  const meanings = new Map(allVocab.map((v) => [v.id, v.m]));
+  const tok = (tokenizer ??= await buildTokenizer());
+  const analysed: { s: PoolSentence; analysis: Analysis }[] = [];
+  for (const s of pool) {
+    if (s.plain.length > MAX_PARTICLE_CHARS || s.en.length > 100 || EXCLUDED_SENTENCES.has(s.plain)) continue;
+    const tokens = tok.tokenize(s.plain);
+    if (tokens.map((t) => t.surface_form).join("") !== s.plain) continue;
+    const analysis = analyse(tokens, forms, n5Ids);
+    if (analysis) analysed.push({ s, analysis });
+  }
+  const pairs = verbPairCounts(analysed.map((x) => x.analysis));
+  const sentenceFiles: Partial<Record<Level, PackSentence[]>> = {};
+  const seenSentences = new Set<string>();
+  const candidates: { record: PackSentence; level: Level; score: number }[] = [];
+  for (const { s, analysis } of analysed) {
+    if (seenSentences.has(s.plain)) continue;
+    const ja = s.ruby ?? (await kuromojiSegments(tok, s.plain));
+    if (plainOf(ja) !== s.plain || !blankIsPlain(ja, analysis.at)) continue;
+    seenSentences.add(s.plain);
+    const record = sentenceRecord(analysis, ja, s.en, meanings, pairs);
+    const score = (s.annotated ? 2 : 0) + (record.w.length >= 2 ? 1 : 0) + (s.en.length <= 60 ? 1 : 0) - record.also.length;
+    candidates.push({ record, level: analysis.level, score });
+  }
+  for (const level of ["n5", "n4"] as const) {
+    const ofLevel = candidates.filter((c) => c.level === level).sort((a, b) => b.score - a.score || a.record.ja.length - b.record.ja.length);
+    const perParticle = new Map<string, number>();
+    const kept: PackSentence[] = [];
+    for (const { record } of ofLevel) {
+      const n = perParticle.get(record.p) ?? 0;
+      if (n >= SENTENCES_PER_PARTICLE) continue;
+      perParticle.set(record.p, n + 1);
+      kept.push(record);
+    }
+    sentenceFiles[level] = kept;
+    console.log(`${level} sentences: ${kept.length} (${[...perParticle].map(([p, n]) => `${p} ${n}`).join(", ")})`);
+  }
+
   // 5. Stroke data (KanjiVG) for every JLPT kanji
   const allKanji = LEVELS.flatMap((level) => kanji[level].map((k) => k.c));
   const strokes = new Map<string, string[]>();
@@ -270,7 +314,9 @@ async function main() {
     await writeFile(path.join(OUT, level, "words.json"), JSON.stringify(words));
     await writeFile(path.join(OUT, level, "kanji.json"), JSON.stringify(kanjiRecords));
     await writeFile(path.join(OUT, level, "strokes.json"), JSON.stringify(strokeRecords));
-    manifest.levels = { ...(manifest.levels as object), [level]: { words: words.length, withExamples, withPitch, withConjugation, kanji: kanjiRecords.length, withStrokes: Object.keys(strokeRecords).length } };
+    const sentences = sentenceFiles[level];
+    if (sentences) await writeFile(path.join(OUT, level, "sentences.json"), JSON.stringify(sentences));
+    manifest.levels = { ...(manifest.levels as object), [level]: { words: words.length, withExamples, withPitch, withConjugation, kanji: kanjiRecords.length, withStrokes: Object.keys(strokeRecords).length, sentences: sentences?.length ?? 0 } };
     console.log(`${level}: ${words.length} words (${withExamples} with examples, ${withPitch} pitch, ${withConjugation} conjugation), ${kanjiRecords.length} kanji`);
   }
 
@@ -296,6 +342,7 @@ async function main() {
   ];
   const files = [];
   for (const level of LEVELS) for (const f of ["words.json", "kanji.json", "strokes.json"]) files.push(path.join(OUT, level, f));
+  for (const level of LEVELS) if (sentenceFiles[level]) files.push(path.join(OUT, level, "sentences.json"));
   files.push(path.join(OUT, "extras.json"));
   let bytes = 0;
   for (const f of files) bytes += (await stat(f)).size;
