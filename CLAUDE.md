@@ -46,6 +46,9 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
 | `src/content/topics.ts`, `src/content/topic-words.ts` | Topics for Practice → Study by topic: 22 topics in four groups, each with its key phrases (kana, tiles, English), linked grammar points and stories. `topic-words.ts` places every N5/N4 noun, verb, adjective and adverb in one topic or in everyday basics (≤15%). Tests: `tests/unit/topics.test.ts` |
 | `src/content/particles.ts`, `scripts/content/sentences.ts`, `scripts/content/sentence-exclusions.ts` | Particle drills: the particle list and families, and the "also correct" rules (hand table plus particles the corpus uses with the same verb). The pack build keeps short sentences of N5/N4 words with one particle blanked, and `sentence-exclusions.ts` lists reviewed sentences to leave out |
 | `src/lib/topic-exercises.ts` | Topic questions: particle questions (English as the hint, furigana around the blank) and phrase quizzes (hear it and pick the meaning, build it from tiles). Pure: the random source is passed in |
+| `src/lib/topic-sessions.ts`, `src/lib/hidden-sentences.ts` | Sessions behind the topic pages (Learn, Practise, Key phrases, Real-life sentences, Particles) and the "Hide this sentence" store (this device only) |
+| `src/components/topic-study.tsx`, `src/app/(tabs)/practice/topics/page.tsx` | Study by topic: the index with progress, a topic or word-type page (modes, word list, grammar and story links, Save for offline), and the particle page |
+| `src/components/furigana.tsx` | Furigana (ruby) for Japanese text. Used by word pages and by question prompts |
 | `src/content/generated/*.json` | Generated JLPT vocab/kanji (do not edit by hand; run `npm run content`) |
 | `src/content/loader.ts` | Lazy loading of level data, lesson items and distractor pools |
 | `src/lib/lesson-engine.ts` | Exercise generation for lessons, reviews and practice |
@@ -165,6 +168,30 @@ localStorage) · ts-fsrs · WanaKana · Firebase JS SDK 13 · Serwist (service w
 - The achievement toast reads a last-seen list kept in `localStorage` on this device. The first visit records the
   current achievements without a toast, so existing progress is not announced.
 
+## Topic mode
+
+- **Topics and word types.** `src/content/topics.ts` holds the 22 topics (title, blurb, key phrases with kana, tiles and
+  English, and the grammar points and stories they link). `src/content/topic-words.ts` holds each topic's word ids in
+  course order. Every N5 and N4 noun, verb, adjective and adverb is in a topic or in `everyday-basics` (at most 15%), and
+  a word is in at most two topics. Word types come from `src/content/generated/word-types.json` (`npm run topics`).
+- **Lesson ids and progress.** A topic's Learn run records the lesson `t-<topic id>` (word types: `t-type-<group>`), so the
+  words become review cards. These ids are stored in progress: never rename one. The path pointer ignores them.
+- **Sessions.** `/practice/run?set=<id>&mode=<mode>` runs them. `setFor` in `src/content/practice-sets.ts` resolves the id
+  (a dojo set, a topic, a word type, or `particles` / `particles-<family>`). `planFor` in `src/lib/topic-sessions.ts`
+  builds the exercises. Learn takes six new words, as a path lesson does, and known words skip their intro cards.
+  Practise asks fifteen questions on the words the learner has met. Key phrases hear a phrase and pick its meaning, then
+  build it from tiles. Real-life sentences blank a topic word in a pack sentence, and need the packs (online, or saved).
+  Particles use the packs, or the hand-written grammar sentences when the packs are not saved.
+- **Particle sentences.** `scripts/content/sentences.ts` picks them while `npm run packs` runs; the rules are listed under
+  Knowledge packs. `src/content/particles.ts` holds the particle families and the "also correct" rules. A drill never
+  offers a particle that also fits.
+- **Hide this sentence.** After a sentence question, the learner can hide that sentence. It is stored in localStorage
+  (`polyglot.hiddenSentences`) and never synced, so it applies to this device only.
+- **Dictionary.** The "Show" menu filters the list to all words, one topic, or one word type. Search stays inside the
+  filter. A word's page shows its topics as badges, and tapping one applies the filter.
+- **Offline.** Save for offline on a topic page or the particle page caches the N5 and N4 pack files, including
+  `sentences.json`, in the same cache Profile uses.
+
 ## Known issues
 
 - **Hydration mismatch (React #418), intermittent**: with the service worker active, roughly one browser-test run in
@@ -267,6 +294,39 @@ Format:
   reason, and a stale exception fails the test.
 - Notes: the word lists are hand-placed. Each topic lists its words in course order (N5 first). Stories and grammar
   points are linked from the topics, not tagged on the stories themselves.
+
+### 2026-10-24 — Study by topic: pages, sessions, dictionary filter (topic mode, phase 5)
+- Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
+- Changes:
+  - Practice → Study by topic (`/practice/topics`): the 22 topics in four groups and seven word-type cards, each with
+    "learned / total". A topic page has an N5, N4 or both filter, the word list with audio and memory strength, the Learn,
+    Practise, Key phrases and Real-life sentences modes, the grammar and story links, and Save for offline. Practice and
+    the Today card link to it.
+  - Learn takes the next six words, runs intro cards, recognition, matching and recall, and records lesson `t-<topic>`
+    when it ends. Known words in a path lesson skip their intro cards and keep their questions, and the lesson card says
+    "N of M words already known".
+  - Particles (`/practice/topics?id=particles`): all particles or one family. A wrong answer shows its "Why?" note, and
+    a "Hide this sentence" button stores the sentence on this device.
+  - Dictionary → Show: all words, one topic or one word type. Word pages show their topics as badges.
+  - The Furigana component moved out of the word page so questions can use it too.
+- Files: `src/lib/topic-sessions.ts`, `src/lib/hidden-sentences.ts`, `src/components/topic-study.tsx`,
+  `src/components/furigana.tsx`, `src/app/(tabs)/practice/topics/page.tsx` (new); `src/content/practice-sets.ts`,
+  `src/app/practice/run/page.tsx`, `src/components/lesson/player.tsx`, `src/components/lesson/exercises.tsx`,
+  `src/components/word/word-panel.tsx`, `src/app/(tabs)/dictionary/page.tsx`, `src/app/(tabs)/practice/page.tsx`,
+  `src/components/today-card.tsx`, `src/components/learning-path.tsx`, `src/app/lesson/page.tsx`,
+  `src/lib/lesson-engine.ts`, `src/lib/topic-exercises.ts`, `src/content/packs.ts`, `src/content/topic-words.ts`,
+  `src/lib/types.ts`, `tests/unit/topic-sessions.test.ts` (new), `tests/unit/packs.test.ts`, `tests/rules/firestore.rules.test.ts`,
+  `tests/e2e/app.spec.ts`, `tests/e2e/helpers.ts`, `CLAUDE.md`
+- Verification: lint and typecheck pass; unit tests 205 of 205 pass (22 files), including the session tests (16) and
+  the hidden-sentence store; browser tests 32 of 32 on iPhone and desktop, including a Learn run to "Lesson complete!",
+  the dictionary filter and its word-page badge, the particle drill with the packs blocked, real-life sentences with
+  Hide, and no horizontal scroll at 390px on the topic pages; rules tests 10 of 10, including `t-` lesson writes;
+  `test:sync` 3 of 3 on desktop; `npm run build` passes.
+- Notes: The runner still finds the pack level from a vocabulary set's id, as before. Topic sets run as sessions, so they
+  never reach that code, and the change to item levels was not needed. Real-life sentences need the packs: until they are
+  saved or loaded, the page says so. No sync test covers a `t-` lesson record yet; the existing lesson sync is unchanged.
+  The runner's set lookup is memoised, because a new set object on each render restarted the session in a loop; the
+  browser test caught it.
 
 ### 2026-10-24 — Particle drills and phrase quizzes (topic mode, phase 4)
 - Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed

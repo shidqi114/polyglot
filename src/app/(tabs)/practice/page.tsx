@@ -17,6 +17,17 @@ export default function PracticePage() {
         <p className="text-muted">Free drills — no unlocking needed. Earn 1 XP for every 2 correct answers.</p>
       </div>
 
+      <Link
+        href="/practice/topics"
+        className="btn-3d flex items-center justify-between rounded-2xl border-2 border-blue bg-blue-soft p-4 [--shadow:var(--blue)]"
+      >
+        <div>
+          <div className="font-extrabold">Study by topic</div>
+          <div className="text-sm text-muted">Travel, food, school and more, one situation at a time. Plus particles.</div>
+        </div>
+        <span className="text-sm font-extrabold uppercase text-blue">Open</span>
+      </Link>
+
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {PRACTICE_SETS.map((s) => (
           <button

@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures";
-import { playKanaLesson } from "./helpers";
+import { playKanaLesson, playLearnSession } from "./helpers";
 
 const SHOTS = process.env.SCREENSHOT_DIR;
 
@@ -20,6 +20,16 @@ test("knowledge packs are served with the security headers", async ({ request })
   expect(res.ok()).toBe(true);
   expect(res.headers()["content-security-policy"]).toBeTruthy();
   expect((await res.json()).length).toBeGreaterThan(500);
+});
+
+test("particle sentences are served with the packs and the security headers", async ({ request }) => {
+  for (const level of ["n5", "n4"]) {
+    const res = await request.get(`/packs/v2/${level}/sentences.json`);
+    expect(res.ok()).toBe(true);
+    expect(res.headers()["content-security-policy"]).toBeTruthy();
+    const sentences = await res.json();
+    expect(sentences.length).toBeGreaterThan(100);
+  }
 });
 
 test("security headers are served on every page", async ({ request }) => {
@@ -179,3 +189,79 @@ test("weekly review and achievements are reachable from profile", async ({ page 
   await page.goto("/practice/run?set=leeches&mode=pick");
   await expect(page.getByText(/Learn a few more items/)).toBeVisible();
 });
+
+test("study by topic: learn a topic's first words, then see them counted", async ({ page }) => {
+  await page.goto("/practice");
+  await page.getByRole("link", { name: /Study by topic/ }).click();
+  await expect(page.getByRole("heading", { name: "Study by topic" })).toBeVisible();
+  await expectNoHorizontalScroll(page);
+  await shot(page, "topics");
+
+  await page.getByRole("link", { name: /Shopping/ }).first().click();
+  await expect(page.getByRole("heading", { name: "Shopping" })).toBeVisible();
+  await expectNoHorizontalScroll(page);
+  await shot(page, "topic-shopping");
+
+  await page.getByRole("button", { name: /Learn 6 new words/ }).click();
+  await playLearnSession(page);
+  await expect(page.getByText("Lesson complete!")).toBeVisible();
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+
+  // The six words are now met, so the topic counts them, and Practise opens.
+  await expect(page.getByText(/^6 of \d+ learned$/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Practise what I’ve learned" })).toBeEnabled();
+});
+
+test("real-life sentences and hiding a sentence work from the packs", async ({ page }) => {
+  await page.goto("/practice/run?set=eating-out&mode=real");
+  await expect(page.getByText("Fill in the blank")).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByTestId("option").first()).toBeVisible();
+  await expectNoHorizontalScroll(page);
+  await shot(page, "real-sentence");
+
+  await page.goto("/practice/run?set=particles&mode=particles");
+  await expect(page.getByText("Which particle goes in the blank?")).toBeVisible({ timeout: 15_000 });
+  await page.getByTestId("option").first().click();
+  await page.getByRole("button", { name: "Check", exact: true }).click();
+  await page.getByRole("button", { name: "Hide this sentence" }).click();
+  await expect(page.getByRole("button", { name: "Hidden" })).toBeVisible();
+});
+
+test("dictionary: the Show filter narrows the words to one topic, and search stays inside it", async ({ page }) => {
+  await page.goto("/dictionary");
+  await page.getByLabel("Show").selectOption("topic:shopping");
+  await expect(page.getByText(/^Shopping: \d+ words/)).toBeVisible();
+  await page.getByPlaceholder("Search English, romaji, kana or kanji").fill("wallet");
+  await expect(page.getByRole("button", { name: /^財布/ }).first()).toBeVisible();
+  await page.getByPlaceholder("Search English, romaji, kana or kanji").fill("water");
+  await expect(page.getByText("No results.")).toBeVisible();
+  await expectNoHorizontalScroll(page);
+
+  // A word's page lists its topics; following one applies the same filter.
+  await page.getByPlaceholder("Search English, romaji, kana or kanji").fill("wallet");
+  await page.getByRole("button", { name: /^財布/ }).first().click();
+  await page.getByRole("link", { name: "Shopping" }).click();
+  await expect(page.getByText(/^Shopping: \d+ words/)).toBeVisible();
+});
+
+test("particle drill runs from the bundled grammar sentences when the study packs cannot load", async ({ page }) => {
+  await page.route("**/packs/**", (route) => route.abort());
+  await page.goto("/practice/topics?id=particles");
+  await expect(page.getByRole("heading", { name: "Particles" })).toBeVisible();
+  await expectNoHorizontalScroll(page);
+  await page.getByRole("link", { name: /All particles/ }).click();
+  await expect(page.getByText("Which particle goes in the blank?")).toBeVisible();
+  await expect(page.getByTestId("option").first()).toBeVisible();
+  await expectNoHorizontalScroll(page);
+});
+
+test("word types and topic pages open and fit the screen", async ({ page }) => {
+  await page.goto("/practice/topics?id=type-noun");
+  await expect(page.getByRole("heading", { name: "Nouns" })).toBeVisible();
+  await expectNoHorizontalScroll(page);
+  await page.goto("/practice/topics?id=travel-transport");
+  await expect(page.getByRole("heading", { name: "Travel and transport" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Key phrases" })).toBeVisible();
+  await expectNoHorizontalScroll(page);
+});
+

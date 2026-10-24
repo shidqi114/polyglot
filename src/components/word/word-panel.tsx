@@ -6,8 +6,9 @@ import { PitchGraph } from "./pitch-graph";
 import { StrokeOrder } from "./stroke-order";
 import { Button, Card, cn } from "../ui";
 import { AudioButton } from "../lesson/exercises";
+import { Furigana } from "@/components/furigana";
 import { usePack } from "@/content/use-pack";
-import type { PackExample, Segment, VerbForm } from "@/content/packs";
+import type { PackExample, VerbForm } from "@/content/packs";
 import { speak } from "@/lib/tts";
 import type { StudyItem } from "@/lib/types";
 import { useProgress } from "@/store/progress";
@@ -26,24 +27,6 @@ const FORM_LABELS: Record<VerbForm, string> = {
   imperative: "Imperative",
 };
 
-function Furigana({ segments, showReadings }: { segments: Segment[]; showReadings: boolean }) {
-  return (
-    <>
-      {segments.map((seg, i) =>
-        typeof seg === "string" ? (
-          <span key={i}>{seg}</span>
-        ) : showReadings ? (
-          <ruby key={i}>
-            {seg[0]}
-            <rt className="text-[0.55em]">{seg[1]}</rt>
-          </ruby>
-        ) : (
-          <span key={i}>{seg[0]}</span>
-        ),
-      )}
-    </>
-  );
-}
 
 function ExampleRow({ example, showReadings }: { example: PackExample; showReadings: boolean }) {
   const [revealed, setRevealed] = useState(false);

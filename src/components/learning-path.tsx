@@ -7,8 +7,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, cn, ProgressBar } from "./ui";
 import { TodayCard } from "./today-card";
 import { COURSE } from "@/content/course";
+import { getLessonItems } from "@/content/loader";
 import { lessonStatus, pathPointer, type LessonStatus, type PathPointer } from "@/lib/course-progress";
-import type { LessonRef, Section, Unit } from "@/lib/types";
+import type { LessonRef, Section, StudyItem, Unit } from "@/lib/types";
 import { useProgress } from "@/store/progress";
 
 const UNIT_COLORS = [
@@ -93,6 +94,7 @@ function LessonNode({
                 ? "Not unlocked yet. You can jump ahead if you already know this."
                 : lessonDescription(lesson)}
           </div>
+          {active && status !== "done" && <KnownNote lesson={lesson} />}
           <Button
             variant="secondary"
             className="w-full"
@@ -103,6 +105,29 @@ function LessonNode({
           </Button>
         </div>
       )}
+    </div>
+  );
+}
+
+/** "3 of 6 words already known", for a vocabulary lesson the learner has partly met (from lessons or topics). */
+function KnownNote({ lesson }: { lesson: LessonRef }) {
+  const cards = useProgress((s) => s.cards);
+  const [items, setItems] = useState<StudyItem[] | null>(null);
+  useEffect(() => {
+    if (lesson.kind !== "vocab") return;
+    let cancelled = false;
+    getLessonItems(lesson)
+      .then(({ items }) => !cancelled && setItems(items))
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [lesson]);
+  const known = items?.filter((i) => cards[i.id]).length ?? 0;
+  if (!items || !known) return null;
+  return (
+    <div className="mb-3 text-sm font-extrabold text-white/95">
+      {known} of {items.length} words already known
     </div>
   );
 }

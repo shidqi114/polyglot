@@ -9,6 +9,7 @@ import { sounds } from "@/lib/sound";
 import { speak } from "@/lib/tts";
 import type { Exercise, GrammarLesson, StudyItem } from "@/lib/types";
 import { useProgress } from "@/store/progress";
+import { Furigana } from "@/components/furigana";
 
 type Ex<T extends Exercise["type"]> = Extract<Exercise, { type: T }>;
 
@@ -149,7 +150,9 @@ export function ChoiceExercise({
         <div className="mb-8 flex items-center gap-4">
           {ex.audio && <AudioButton text={ex.audio} />}
           <div className="min-w-0">
-            <div data-testid="prompt" className={cn("jp font-bold", ex.prompt.length > 8 ? "text-2xl sm:text-3xl" : "text-5xl")}>{ex.prompt}</div>
+            <div data-testid="prompt" className={cn("jp font-bold", ex.prompt.length > 8 ? "text-2xl sm:text-3xl" : "text-5xl")}>
+              {ex.promptRuby ? <Furigana segments={ex.promptRuby} showReadings={showReadings} /> : ex.prompt}
+            </div>
             {ex.promptSub && <div className="jp mt-1 text-muted">{ex.promptSub}</div>}
           </div>
         </div>

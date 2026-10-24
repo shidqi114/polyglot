@@ -52,7 +52,10 @@ function Lesson({ lessonId }: { lessonId: string }) {
           if (!cancelled) setExercises(buildGrammarLesson(g));
         } else {
           const { items, pool } = await getLessonItems(lesson);
-          const built = buildItemLesson(items, pool);
+          // Words the learner already has skip their intro cards, but keep their questions.
+          const cards = useProgress.getState().cards;
+          const known = new Set(items.filter((i) => cards[i.id]).map((i) => i.id));
+          const built = buildItemLesson(items, pool, Math.random, known);
           // Vocabulary lessons add sentence cloze questions when the study pack is available offline or online.
           const words = lesson.kind === "vocab" ? await loadWords(lesson.level!).catch(() => undefined) : undefined;
           if (!cancelled) setExercises(words ? addClozeExercises(built, items, words, pool) : built);

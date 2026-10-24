@@ -6,6 +6,7 @@ import { BuildExercise, ChoiceExercise, GrammarNote, InputExercise, IntroCard, M
 import { Button, cn, ProgressBar } from "../ui";
 import { checkBuild, checkInput } from "@/lib/answer-check";
 import { explainChoice, explainKana } from "@/lib/explain";
+import { hideSentence } from "@/lib/hidden-sentences";
 import { toKana } from "wanakana";
 import { retry } from "@/lib/lesson-engine";
 import { sounds, vibrate } from "@/lib/sound";
@@ -48,6 +49,8 @@ export function LessonPlayer({ exercises, onExit, onFinish, onGraded, repeatMist
   const [queue, setQueue] = useState<Exercise[]>(exercises);
   const [idx, setIdx] = useState(0);
   const [feedback, setFeedback] = useState<Feedback>(null);
+  /** The exercise whose sentence the learner hid, so the button can say so. */
+  const [hiddenKey, setHiddenKey] = useState<string | null>(null);
   const [choice, setChoice] = useState<number | null>(null);
   const [text, setText] = useState("");
   const [built, setBuilt] = useState<number[]>([]);
@@ -216,6 +219,19 @@ export function LessonPlayer({ exercises, onExit, onFinish, onGraded, repeatMist
                   ))}
               </div>
               {feedback.audio && <AudioButton text={feedback.audio} size="sm" />}
+              {ex.type === "choice" && ex.hideKey && (
+                <button
+                  type="button"
+                  disabled={hiddenKey === ex.key}
+                  onClick={() => {
+                    hideSentence(ex.hideKey!);
+                    setHiddenKey(ex.key);
+                  }}
+                  className="shrink-0 text-sm font-bold text-muted underline disabled:no-underline"
+                >
+                  {hiddenKey === ex.key ? "Hidden" : "Hide this sentence"}
+                </button>
+              )}
             </div>
           ) : (
             <div className="hidden sm:block">

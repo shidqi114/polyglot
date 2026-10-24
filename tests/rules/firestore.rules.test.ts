@@ -32,6 +32,9 @@ describe("own progress is accepted", () => {
     await assertSucceeds(setDoc(doc(db, "users/alice"), { settings, settingsUp: 1_800_000_000_000, srv: serverTimestamp() }, { merge: true }));
     await assertSucceeds(setDoc(doc(db, "users/alice/days/2026-10-22"), day(), { merge: true }));
     await assertSucceeds(setDoc(doc(db, "users/alice/lessons/n5-v-1"), lesson(), { merge: true }));
+    // Topic Learn runs record their lesson as t-<topic id>, which the same id rule accepts.
+    await assertSucceeds(setDoc(doc(db, "users/alice/lessons/t-meeting-people"), lesson(), { merge: true }));
+    await assertSucceeds(setDoc(doc(db, "users/alice/lessons/t-type-i-adjective"), lesson(), { merge: true }));
     await assertSucceeds(setDoc(doc(db, "users/alice/cards/v:水:みず"), card({ lr: null, cf: ["v:肉:にく"] })));
     await assertSucceeds(setDoc(doc(db, "users/alice/notes/k:水"), note()));
     await assertSucceeds(getDoc(doc(db, "users/alice/cards/v:水:みず")));
@@ -79,6 +82,7 @@ describe("values are checked", () => {
   it("rejects bad lesson ids and out-of-range results", async () => {
     const db = alice();
     await assertFails(setDoc(doc(db, "users/alice/lessons/Bad Id"), lesson()));
+    await assertFails(setDoc(doc(db, "users/alice/lessons/T-Shopping"), lesson()));
     await assertFails(setDoc(doc(db, "users/alice/lessons/n5-v-1"), lesson({ best: 2 })));
   });
 

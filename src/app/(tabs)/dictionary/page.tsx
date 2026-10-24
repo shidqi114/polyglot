@@ -1,14 +1,20 @@
 "use client";
 
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ArrowLeft, Search } from "lucide-react";
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { Suspense, useDeferredValue, useEffect, useMemo, useState } from "react";
 import { isRomaji, toHiragana } from "wanakana";
 import { AudioButton, KanjiReadings } from "@/components/lesson/exercises";
 import { GrammarReference } from "@/components/grammar-reference";
 import { WordPanel } from "@/components/word/word-panel";
 import { Card, cn } from "@/components/ui";
+import wordTypes from "@/content/generated/word-types.json";
 import { loadIndex } from "@/content/loader";
+import { TOPICS, TOPIC_BY_ID, type TopicId } from "@/content/topics";
+import { TOPIC_WORDS, TOPICS_OF_WORD } from "@/content/topic-words";
 import { strengthBars } from "@/lib/srs";
+import { WORD_TYPE_SETS } from "@/lib/topic-sessions";
 import type { StudyItem } from "@/lib/types";
 import { useProgress } from "@/store/progress";
 
@@ -90,6 +96,15 @@ function Detail({ item, all, onBack, onOpen }: { item: StudyItem; all: StudyItem
         <div className="jp text-7xl font-bold">{item.front}</div>
         {item.kind === "vocab" && item.reading !== item.front && <div className="jp text-2xl text-muted">{item.reading}</div>}
         <div className="text-xl font-bold">{item.meanings.join(", ")}</div>
+        {item.kind === "vocab" && (TOPICS_OF_WORD.get(item.id) ?? []).length > 0 && (
+          <div className="mt-1 flex flex-wrap justify-center gap-2">
+            {(TOPICS_OF_WORD.get(item.id) ?? []).map((id) => (
+              <Link key={id} href={`/dictionary?show=topic:${id}`} className="rounded-full bg-blue-soft px-3 py-1 text-xs font-extrabold text-blue">
+                {TOPIC_BY_ID[id].title}
+              </Link>
+            ))}
+          </div>
+        )}
         <div className="mt-2 flex gap-3">
           <AudioButton text={item.reading} />
           <AudioButton text={item.reading} slow />
@@ -136,9 +151,25 @@ function Detail({ item, all, onBack, onOpen }: { item: StudyItem; all: StudyItem
   );
 }
 
-export default function DictionaryPage() {
+const LIST_LIMIT = 300;
+const TYPES = wordTypes as Record<string, string>;
+
+/** The words a "Show" choice covers: all words, one topic, or one word type. */
+function scopeItems(all: StudyItem[], show: string): StudyItem[] {
+  const [kind, id] = show.split(":");
+  if (kind === "topic" && id in TOPIC_WORDS) {
+    const ids = new Set(TOPIC_WORDS[id as TopicId]);
+    return all.filter((i) => ids.has(i.id));
+  }
+  const group = kind === "type" ? WORD_TYPE_SETS.find((g) => g.id === id) : undefined;
+  if (group) return all.filter((i) => i.kind === "vocab" && group.types.includes(TYPES[i.id]));
+  return all;
+}
+
+function DictionaryView({ initialShow }: { initialShow: string }) {
   const [all, setAll] = useState<StudyItem[] | null>(null);
   const [query, setQuery] = useState("");
+  const [show, setShow] = useState(initialShow);
   const [selected, setSelected] = useState<StudyItem | null>(null);
   const [tab, setTab] = useState<Tab>("words");
   const deferred = useDeferredValue(query);
@@ -149,7 +180,9 @@ export default function DictionaryPage() {
       .catch(() => setAll([]));
   }, []);
 
-  const results = useMemo(() => (all ? search(all, deferred) : []), [all, deferred]);
+  const scope = useMemo(() => (all ? scopeItems(all, show) : []), [all, show]);
+  const results = useMemo(() => (deferred ? search(scope, deferred) : scope.slice(0, LIST_LIMIT)), [scope, deferred]);
+  const scopeTitle = show === "all" ? null : show.startsWith("topic:") ? TOPIC_BY_ID[show.slice(6) as TopicId]?.title : WORD_TYPE_SETS.find((g) => `type:${g.id}` === show)?.title;
 
   if (selected && all)
     return (
@@ -177,6 +210,30 @@ export default function DictionaryPage() {
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-black">Dictionary</h1>
       <DictionaryTabs tab={tab} onChange={setTab} />
+      <label className="flex items-center gap-3 text-sm font-extrabold text-muted">
+        Show
+        <select
+          value={show}
+          onChange={(e) => setShow(e.target.value)}
+          className="min-w-0 flex-1 rounded-xl border-2 border-border bg-surface px-3 py-2 text-base font-semibold text-text"
+        >
+          <option value="all">All words</option>
+          <optgroup label="Topics">
+            {TOPICS.map((t) => (
+              <option key={t.id} value={`topic:${t.id}`}>
+                {t.title}
+              </option>
+            ))}
+          </optgroup>
+          <optgroup label="Word types">
+            {WORD_TYPE_SETS.map((g) => (
+              <option key={g.id} value={`type:${g.id}`}>
+                {g.title}
+              </option>
+            ))}
+          </optgroup>
+        </select>
+      </label>
       <label className="flex items-center gap-3 rounded-2xl border-2 border-border bg-surface-2 px-4 focus-within:border-blue">
         <Search className="h-5 w-5 text-muted" />
         <input
@@ -190,13 +247,18 @@ export default function DictionaryPage() {
         />
       </label>
       {!all && <p className="text-muted">Loading dictionary…</p>}
-      {all && !query && (
+      {all && scopeTitle && (
+        <p className="text-sm text-muted">
+          {scopeTitle}: {scope.length.toLocaleString()} words{query ? "" : `, N5 first. Search to narrow them.`}
+        </p>
+      )}
+      {all && !query && show === "all" && (
         <p className="text-sm text-muted">
           {all.filter((i) => i.kind === "vocab").length.toLocaleString()} JLPT words and{" "}
           {all.filter((i) => i.kind === "kanji").length.toLocaleString()} kanji. Try “taberu”, “water” or “日”.
         </p>
       )}
-      {all && query && results.length === 0 && <p className="text-muted">No results.</p>}
+      {all && deferred && results.length === 0 && <p className="text-muted">No results.</p>}
       <div className={cn("flex flex-col divide-y-2 divide-border overflow-hidden rounded-2xl border-2 border-border", !results.length && "hidden")}>
         {results.map((item) => (
           <button key={item.id} onClick={() => setSelected(item)} className="flex items-center gap-3 bg-surface px-4 py-3 text-left hover:bg-surface-2">
@@ -213,3 +275,18 @@ export default function DictionaryPage() {
     </div>
   );
 }
+
+export default function DictionaryPage() {
+  return (
+    <Suspense>
+      <DictionaryRoute />
+    </Suspense>
+  );
+}
+
+/** `/dictionary?show=topic:shopping` opens the dictionary already filtered to that topic. */
+function DictionaryRoute() {
+  const show = useSearchParams().get("show") ?? "all";
+  return <DictionaryView key={show} initialShow={show} />;
+}
+

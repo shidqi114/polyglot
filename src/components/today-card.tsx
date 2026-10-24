@@ -90,6 +90,11 @@ export function TodayCard({ nextId }: { nextId?: string }) {
         </Link>
       </div>
 
+      <Link href="/practice/topics" className="mb-4 flex items-center justify-between rounded-2xl border-2 border-border bg-surface px-4 py-3 text-sm font-extrabold">
+        Study by topic
+        <span className="uppercase text-blue">Open</span>
+      </Link>
+
       <div className="grid gap-4 sm:grid-cols-2">
         {word && (
           <Pick label="Word of the day">

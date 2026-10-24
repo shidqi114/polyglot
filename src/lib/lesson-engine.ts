@@ -196,12 +196,16 @@ function harder(item: StudyItem, pool: StudyItem[], rng: Rng): Exercise {
 }
 
 /** Lesson for kana / vocab / kanji: introduce, recognise, match, then recall. */
-export function buildItemLesson(items: StudyItem[], pool: StudyItem[], rng: Rng = Math.random): Exercise[] {
+/**
+ * A lesson of new items: intro cards, recognition, matching and recall. An item the learner already knows (`known`)
+ * skips its intro card but keeps its questions.
+ */
+export function buildItemLesson(items: StudyItem[], pool: StudyItem[], rng: Rng = Math.random, known: ReadonlySet<string> = new Set()): Exercise[] {
   const fullPool = [...pool, ...items.filter((i) => !pool.includes(i))];
   const out: Exercise[] = [];
   for (let i = 0; i < items.length; i += 2) {
     const pair = items.slice(i, i + 2);
-    for (const it of pair) out.push({ type: "intro", key: key("intro"), item: it });
+    for (const it of pair) if (!known.has(it.id)) out.push({ type: "intro", key: key("intro"), item: it });
     for (const it of pair) out.push(recognize(it, fullPool, rng));
   }
   const m = match(items, rng);

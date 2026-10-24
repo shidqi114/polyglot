@@ -206,3 +206,9 @@ export const TOPIC_WORDS: Record<TopicId, readonly string[]> = {
 
 /** Everyday words that no single topic claims; the Everyday basics topic studies these. */
 export const GENERAL_WORD_IDS = TOPIC_WORDS["everyday-basics"];
+
+/** The topics that list each word, for the badges on a word's page. */
+export const TOPICS_OF_WORD = new Map<string, TopicId[]>();
+for (const id of Object.keys(TOPIC_WORDS) as TopicId[]) {
+  for (const wordId of TOPIC_WORDS[id]) TOPICS_OF_WORD.set(wordId, [...(TOPICS_OF_WORD.get(wordId) ?? []), id]);
+}

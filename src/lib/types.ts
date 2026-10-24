@@ -86,6 +86,8 @@ export type Exercise =
       /** The prompt with furigana, when the question is Japanese text with readings. */
       promptRuby?: RubySegment[];
       promptSub?: string;
+      /** The sentence this question comes from. Set on sentence questions, so the learner can hide the sentence. */
+      hideKey?: string;
       /** Japanese text to speak; when audioOnly the prompt text is hidden. */
       audio?: string;
       audioOnly?: boolean;

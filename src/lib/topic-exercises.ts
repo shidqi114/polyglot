@@ -52,24 +52,27 @@ export function particleItemsFromGrammar(sentences: GrammarSentence[], level: "n
   return items;
 }
 
-/** Plain text of a ruby sentence with the blank written as ＿＿. */
-export function blankedText(item: ParticleItem): string {
-  const plain = item.ja.map((s) => (typeof s === "string" ? s : s[0])).join("");
-  return `${plain.slice(0, item.at)}＿＿${plain.slice(item.at + item.p.length)}`;
+/** The sentence's plain text. */
+export const plainOf = (segments: RubySegment[]) => segments.map((s) => (typeof s === "string" ? s : s[0])).join("");
+
+/** The plain text with the span from `at` to `at + length` written as ＿＿. */
+export function blankSpan(ja: RubySegment[], at: number, length: number): string {
+  const plain = plainOf(ja);
+  return `${plain.slice(0, at)}＿＿${plain.slice(at + length)}`;
 }
 
-/** The sentence's segments with the particle replaced by a blank, keeping the furigana of the other words. */
-export function blankedRuby(item: ParticleItem): RubySegment[] {
+/** The segments with the span from `at` to `at + length` replaced by a blank, keeping the furigana of the other words. */
+export function blankSpanRuby(ja: RubySegment[], at: number, length: number): RubySegment[] {
   const out: RubySegment[] = [];
   let offset = 0;
   let placed = false;
-  for (const segment of item.ja) {
+  for (const segment of ja) {
     const text = typeof segment === "string" ? segment : segment[0];
     const start = offset;
     offset += text.length;
-    if (!placed && item.at >= start && item.at < offset && typeof segment === "string") {
-      const before = segment.slice(0, item.at - start);
-      const after = segment.slice(item.at - start + item.p.length);
+    if (!placed && at >= start && at < offset && typeof segment === "string") {
+      const before = segment.slice(0, at - start);
+      const after = segment.slice(at - start + length);
       if (before) out.push(before);
       out.push("＿＿");
       if (after) out.push(after);
@@ -80,6 +83,12 @@ export function blankedRuby(item: ParticleItem): RubySegment[] {
   }
   return out;
 }
+
+/** Plain text of a particle item with its blank written as ＿＿. */
+export const blankedText = (item: ParticleItem) => blankSpan(item.ja, item.at, item.p.length);
+
+/** The particle item's segments with its blank. */
+export const blankedRuby = (item: ParticleItem) => blankSpanRuby(item.ja, item.at, item.p.length);
 
 /** Three wrong particles for a blank: from the same family first, then from the rest, never one that also fits. */
 function distractorsFor(item: ParticleItem, rng: Rng): Particle[] {
@@ -103,6 +112,7 @@ export function particleExercise(item: ParticleItem, rng: Rng = Math.random): Ex
     prompt: blankedText(item),
     promptRuby: blankedRuby(item),
     promptSub: item.en,
+    hideKey: plainOf(item.ja),
     optionsJapanese: true,
     options,
     answer: item.p,
