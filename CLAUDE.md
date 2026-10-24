@@ -278,23 +278,6 @@ Format:
 - Notes: follow-ups, migrations, or manual steps (e.g. deploy rules, new env vars)
 ```
 
-### 2026-10-24 — Topics: word lists and key phrases (topic mode, phase 3)
-- Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
-- Changes:
-  - 22 topics in four groups (Me and my day, Out and about, Free time, School, work and health). Everyday basics holds
-    the general words. The other 21 are situations such as Eating out, Travel and transport, and School.
-  - Every N5 and N4 noun, verb, adjective and adverb (1,210 words) is in a topic or in everyday basics. 1,003 are in a
-    topic (11 of them in two), and 207 (14.9%) are in everyday basics.
-  - Each topic has 7 or 8 key phrases, with kana for audio, tiles for the build quiz and English. Each topic also links
-    its grammar points and stories. The topic pages come in phase 5.
-- Files: `src/content/topics.ts` (new), `src/content/topic-words.ts` (new), `tests/unit/topics.test.ts` (new), `CLAUDE.md`
-- Verification: lint and typecheck pass; unit tests 155 of 155 pass. The topic tests check that every word is placed, no
-  word is in more than two topics, everyday basics is at most 15%, every topic has at least ten words, the phrase tiles
-  join back to the Japanese, and the phrase kana matches kuromoji. Six reviewed readings are excepted, each with its
-  reason, and a stale exception fails the test.
-- Notes: the word lists are hand-placed. Each topic lists its words in course order (N5 first). Stories and grammar
-  points are linked from the topics, not tagged on the stories themselves.
-
 ### 2026-10-24 — Study by topic: pages, sessions, dictionary filter (topic mode, phase 5)
 - Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
 - Changes:
@@ -356,6 +339,23 @@ Format:
   particles. About 90 sampled sentences were checked by eye, and none needed excluding. The exclusion list stays empty
   until the "Hide this sentence" feature (phase 5) shows real bad ones. Blanks that are part of a longer word are
   rejected for これまで and 今から; other compounds are not checked.
+
+### 2026-10-24 — Topics: word lists and key phrases (topic mode, phase 3)
+- Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
+- Changes:
+  - 22 topics in four groups (Me and my day, Out and about, Free time, School, work and health). Everyday basics holds
+    the general words. The other 21 are situations such as Eating out, Travel and transport, and School.
+  - Every N5 and N4 noun, verb, adjective and adverb (1,210 words) is in a topic or in everyday basics. 1,003 are in a
+    topic (11 of them in two), and 207 (14.9%) are in everyday basics.
+  - Each topic has 7 or 8 key phrases, with kana for audio, tiles for the build quiz and English. Each topic also links
+    its grammar points and stories. The topic pages come in phase 5.
+- Files: `src/content/topics.ts` (new), `src/content/topic-words.ts` (new), `tests/unit/topics.test.ts` (new), `CLAUDE.md`
+- Verification: lint and typecheck pass; unit tests 155 of 155 pass. The topic tests check that every word is placed, no
+  word is in more than two topics, everyday basics is at most 15%, every topic has at least ten words, the phrase tiles
+  join back to the Japanese, and the phrase kana matches kuromoji. Six reviewed readings are excepted, each with its
+  reason, and a stale exception fails the test.
+- Notes: the word lists are hand-placed. Each topic lists its words in course order (N5 first). Stories and grammar
+  points are linked from the topics, not tagged on the stories themselves.
 
 ### 2026-10-24 — Pronoun tags for これ, 私 and どこ (topic mode, phase 2 fix)
 - Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
