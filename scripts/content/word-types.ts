@@ -70,6 +70,8 @@ export function classify(headword: string, tokens: Token[]): WordType {
     case "接続詞":
       return "set-phrase";
     case "名詞":
+      // IPADIC tags これ, 私 and どこ as 名詞 with the sub-type 代名詞.
+      if (head.pos_detail_1 === "代名詞") return "pronoun";
       if (head.pos_detail_1 === "形容動詞語幹") return "na-adjective";
       if (head.pos_detail_1 === "数") return "number";
       // 日 in 誕生日 is part of a compound noun; a counter follows a numeral (一日, 二人).

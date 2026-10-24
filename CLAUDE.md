@@ -244,6 +244,15 @@ Format:
 - Notes: follow-ups, migrations, or manual steps (e.g. deploy rules, new env vars)
 ```
 
+### 2026-10-24 — Pronoun tags for これ, 私 and どこ (topic mode, phase 2 fix)
+- Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
+- Changes:
+  - これ, 私, どこ and similar words are typed as pronouns. kuromoji tags them as nouns with the sub-type 代名詞, which
+    left them counted as nouns. Pronouns now number 43 (N5 and N4), up from 19.
+- Files: `scripts/content/word-types.ts`, `src/content/generated/word-types.json`, `CLAUDE.md`
+- Verification: word-type tests 4 of 4 pass, including the check that the committed file matches a fresh `npm run topics`.
+- Notes: none.
+
 ### 2026-10-23 — Word types for N5 and N4 (topic mode, phase 2)
 - Branch: `claude/festive-brahmagupta-ba5e9f` · PR: not opened · Status: pushed
 - Changes:

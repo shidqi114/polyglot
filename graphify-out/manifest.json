@@ -414,9 +414,9 @@
     "semantic_hash": "d69ffbb9f2f3e79a3a1fd885fc688736"
   },
   "CLAUDE.md": {
-    "mtime": 1792799871.072331,
-    "seen": 1792799926.1898699,
-    "ast_hash": "f63e68d23f0ed658ad7f1464fc5d66c4",
+    "mtime": 1792800805.0131311,
+    "seen": 1792800808.1179793,
+    "ast_hash": "ea1adcfe341c02ed4bbde5c7a94eb880",
     "semantic_hash": ""
   },
   "README.md": {
@@ -816,21 +816,39 @@
     "semantic_hash": ""
   },
   "scripts/content/word-types.ts": {
-    "mtime": 1792799825.5710719,
-    "seen": 1792799926.186577,
-    "ast_hash": "459a0747128ac88f6b7cf35387653e3c",
+    "mtime": 1792799985.5419354,
+    "seen": 1792800808.1140232,
+    "ast_hash": "21ea17b25407b87968bc5e5e65584b68",
     "semantic_hash": ""
   },
   "src/content/generated/word-types.json": {
-    "mtime": 1792799826.705926,
-    "seen": 1792799926.1883445,
-    "ast_hash": "176db6b8bc854d58c4f45cd6a663d4ce",
+    "mtime": 1792799986.6939354,
+    "seen": 1792800808.1159565,
+    "ast_hash": "01db53bc18c641874733ff67295cecde",
     "semantic_hash": ""
   },
   "tests/unit/word-types.test.ts": {
     "mtime": 1792799802.128849,
     "seen": 1792799926.1897285,
     "ast_hash": "dbcb35314e7ccd8bf4e2e1ed69305ab2",
+    "semantic_hash": ""
+  },
+  "src/content/topic-words.ts": {
+    "mtime": 1792800537.6939683,
+    "seen": 1792800808.1162298,
+    "ast_hash": "23c4fd6ad863738640c1439d44f9d643",
+    "semantic_hash": ""
+  },
+  "src/content/topics.ts": {
+    "mtime": 1792800680.8899767,
+    "seen": 1792800808.1162326,
+    "ast_hash": "e9cc7b6a90a49886d7055f986f3471ca",
+    "semantic_hash": ""
+  },
+  "tests/unit/topics.test.ts": {
+    "mtime": 1792800781.878138,
+    "seen": 1792800808.1177478,
+    "ast_hash": "b6fa943f4fc993fc6d49fd7d81822028",
     "semantic_hash": ""
   }
 }
